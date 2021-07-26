@@ -84,6 +84,7 @@ def toPdf(name, typ, listesPrincipales, listesAttentes, AVAILABLE_PLACES_SM, AVA
     else:
         pdfkit.from_string(html, 'output/'+typ+'_'+name+'.pdf', options=options, css='assets/style.css')
 
+#
 @login.user_loader
 def load_user(id):
     return User.query.get(id)
