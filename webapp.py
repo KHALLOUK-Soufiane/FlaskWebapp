@@ -97,12 +97,12 @@ def index():
             lp_casa = LPCasa.query.order_by(LPCasa.nomPrenom).all()
             lp_meknes = LPMeknes.query.order_by(LPMeknes.nomPrenom).all()
             lp_rabat = LPRabat.query.order_by(LPRabat.nomPrenom).all()
-            la_casa = LACasa.query.order_by(LACasa.moyenne.desc()).all()
-            la_meknes = LAMeknes.query.order_by(LAMeknes.moyenne.desc()).all()
-            la_rabat = LARabat.query.order_by(LARabat.moyenne.desc()).all()
-            la_casasp = LACasaSP.query.order_by(LACasaSP.moyenne.desc()).all()
-            la_meknessp = LAMeknesSP.query.order_by(LAMeknesSP.moyenne.desc()).all()
-            la_rabatsp = LARabatSP.query.order_by(LARabatSP.moyenne.desc()).all()
+            la_casa = LACasa.query.order_by(LACasa.moyenne.desc()).filter(LACasa.status == 0).all()
+            la_meknes = LAMeknes.query.order_by(LAMeknes.moyenne.desc()).filter(LAMeknes.status == 0).all()
+            la_rabat = LARabat.query.order_by(LARabat.moyenne.desc()).filter(LARabat.status == 0).all()
+            la_casasp = LACasaSP.query.order_by(LACasaSP.moyenne.desc()).filter(LACasaSP.status == 0).all()
+            la_meknessp = LAMeknesSP.query.order_by(LAMeknesSP.moyenne.desc()).filter(LAMeknesSP.status == 0).all()
+            la_rabatsp = LARabatSP.query.order_by(LARabatSP.moyenne.desc()).filter(LARabatSP.status == 0).all()
         except Exception as e:
             error_text = "<p>The error:<br>" + str(e) + "</p>"
             hed = '<h1>Something is broken.</h1>'
@@ -197,6 +197,116 @@ def confirmStudents():
     
     return redirect('/genererLA')
 
+@app.route('/statusStudents', methods=['POST'])
+def statusStudents():
+    if current_user.is_authenticated:
+        if request.form['submit'] == 'casaSM':
+            la = pd.read_sql('SELECT * FROM la_casa', con=db.engine)
+            conf = request.form.getlist('statusCasaSM')
+            confirmed=[]
+            absent=[]
+            for cne in conf:
+                if cne.split('.')[0]=='a':
+                    absent.append(cne.split('.')[1])
+                elif cne.split('.')[0]=='c':
+                    confirmed.append(cne.split('.')[1])
+                
+            app.config['AVAILABLE_PLACES_SM']['casa']-=len(confirmed)
+
+            la['status'] = 0
+            la.loc[la.cne.isin(confirmed), 'status'] = 1
+            la.loc[la.cne.isin(absent), 'status'] = -1
+            la.to_sql('la_casa', con=db.engine, index=False, if_exists='replace')
+
+
+        elif request.form['submit'] == 'meknesSM':
+            la = pd.read_sql('SELECT * FROM la_meknes', con=db.engine)
+            conf = request.form.getlist('statusMeknesSM')
+            confirmed=[]
+            absent=[]
+            for cne in conf:
+                if cne.split('.')[0]=='a':
+                    absent.append(cne.split('.')[1])
+                elif cne.split('.')[0]=='c':
+                    confirmed.append(cne.split('.')[1])
+            
+            app.config['AVAILABLE_PLACES_SM']['meknes']-=len(confirmed)
+            la['status'] = 0
+            la.loc[la.cne.isin(confirmed), 'status'] = 1
+            la.loc[la.cne.isin(absent), 'status'] = -1
+            la.to_sql('la_meknes', con=db.engine, index=False, if_exists='replace')
+
+        elif request.form['submit'] == 'rabatSM':
+            la = pd.read_sql('SELECT * FROM la_rabat', con=db.engine)
+            conf = request.form.getlist('statusRabatSM')
+            confirmed=[]
+            absent=[]
+            for cne in conf:
+                if cne.split('.')[0]=='a':
+                    absent.append(cne.split('.')[1])
+                elif cne.split('.')[0]=='c':
+                    confirmed.append(cne.split('.')[1])
+
+            app.config['AVAILABLE_PLACES_SM']['rabat']-=len(confirmed)
+            la['status'] = 0
+            la.loc[la.cne.isin(confirmed), 'status'] = 1
+            la.loc[la.cne.isin(absent), 'status'] = -1
+            la.to_sql('la_rabat', con=db.engine, index=False, if_exists='replace')
+
+        elif request.form['submit'] == 'casaSP':
+            la = pd.read_sql('SELECT * FROM la_casasp', con=db.engine)
+            conf = request.form.getlist('statusCasaSP')
+            confirmed=[]
+            absent=[]
+            for cne in conf:
+                if cne.split('.')[0]=='a':
+                    absent.append(cne.split('.')[1])
+                elif cne.split('.')[0]=='c':
+                    confirmed.append(cne.split('.')[1]) 
+
+            app.config['AVAILABLE_PLACES_SP']['casa']-=len(confirmed)
+            la['status'] = 0
+            la.loc[la.cne.isin(confirmed), 'status'] = 1
+            la.loc[la.cne.isin(absent), 'status'] = -1
+            la.to_sql('la_casasp', con=db.engine, index=False, if_exists='replace')
+
+
+        elif request.form['submit'] == 'meknesSP':
+            la = pd.read_sql('SELECT * FROM la_meknessp', con=db.engine)
+            conf = request.form.getlist('statusMeknesSP')
+            confirmed=[]
+            absent=[]
+            for cne in conf:
+                if cne.split('.')[0]=='a':
+                    absent.append(cne.split('.')[1])
+                elif cne.split('.')[0]=='c':
+                    confirmed.append(cne.split('.')[1])
+            
+            app.config['AVAILABLE_PLACES_SP']['meknes']-=len(confirmed)
+            la['status'] = 0
+            la.loc[la.cne.isin(confirmed), 'status'] = 1
+            la.loc[la.cne.isin(absent), 'status'] = -1
+            la.to_sql('la_meknessp', con=db.engine, index=False, if_exists='replace')
+            
+        elif request.form['submit'] == 'rabatSP':
+            la = pd.read_sql('SELECT * FROM la_rabatsp', con=db.engine)
+            conf = request.form.getlist('statusRabatSP')
+            confirmed=[]
+            absent=[]
+            for cne in conf:
+                if cne.split('.')[0]=='a':
+                    absent.append(cne.split('.')[1])
+                elif cne.split('.')[0]=='c':
+                    confirmed.append(cne.split('.')[1])
+
+            app.config['AVAILABLE_PLACES_SP']['rabat']-=len(confirmed)
+            la['status'] = 0
+            la.loc[la.cne.isin(confirmed), 'status'] = 1
+            la.loc[la.cne.isin(absent), 'status'] = -1
+            la.to_sql('la_rabatsp', con=db.engine, index=False, if_exists='replace')               
+    
+    return redirect('/')
+
 @app.route('/genererLA', methods=['GET', 'POST'])
 def genererLA():
     if current_user.is_authenticated:
@@ -289,10 +399,12 @@ def genererLA():
         
         for key in listesAttentes:
                 listesAttentes[key]=pd.DataFrame(listesAttentes[key])
+                listesAttentes[key]['status']=0
                 listesAttentes[key].to_sql('la_'+key, con=db.engine, index=False, if_exists='replace')
         
         for key in listesAttentesSP:
                 listesAttentesSP[key]=pd.DataFrame(listesAttentesSP[key])
+                listesAttentesSP[key]['status']=0
                 listesAttentesSP[key].to_sql('la_'+key+'sp', con=db.engine, index=False, if_exists='replace')
         
         app.config['AVAILABLE_PLACES_SM'] = AVAILABLE_PLACES_SM

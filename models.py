@@ -81,6 +81,7 @@ class LACasa(db.Model):
     noteMaths = db.Column(db.Float)
     notePhysique = db.Column(db.Float)
     moyenne = db.Column(db.Float)
+    status = db.Column(db.Integer)
 
 class LAMeknes(db.Model):
     __tablename__ = 'la_meknes'
@@ -93,6 +94,7 @@ class LAMeknes(db.Model):
     noteMaths = db.Column(db.Float)
     notePhysique = db.Column(db.Float)
     moyenne = db.Column(db.Float)
+    status = db.Column(db.Integer)
     
 class LARabat(db.Model):
     __tablename__ = 'la_rabat'
@@ -105,6 +107,7 @@ class LARabat(db.Model):
     noteMaths = db.Column(db.Float)
     notePhysique = db.Column(db.Float)
     moyenne = db.Column(db.Float)
+    status = db.Column(db.Integer)
 
 class LACasaSP(db.Model):
     __tablename__ = 'la_casasp'
@@ -117,6 +120,7 @@ class LACasaSP(db.Model):
     noteMaths = db.Column(db.Float)
     notePhysique = db.Column(db.Float)
     moyenne = db.Column(db.Float)
+    status = db.Column(db.Integer)
 
 class LAMeknesSP(db.Model):
     __tablename__ = 'la_meknessp'
@@ -129,6 +133,7 @@ class LAMeknesSP(db.Model):
     noteMaths = db.Column(db.Float)
     notePhysique = db.Column(db.Float)
     moyenne = db.Column(db.Float)
+    status = db.Column(db.Integer)
     
 class LARabatSP(db.Model):
     __tablename__ = 'la_rabatsp'
@@ -141,6 +146,7 @@ class LARabatSP(db.Model):
     noteMaths = db.Column(db.Float)
     notePhysique = db.Column(db.Float)
     moyenne = db.Column(db.Float)
+    status = db.Column(db.Integer)
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'

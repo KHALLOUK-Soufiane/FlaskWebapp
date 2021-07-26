@@ -271,7 +271,14 @@
                         <button class='btn' id="LACasaSMButton">SM</button>
                         <button class='btn' id="LACasaSPButton">SP</button>
                     </div>
+                    <form action="statusStudents" method="post" id='statusFormCasaSM'></form>
                     <table class="table" id='laCasaSM'>
+                        <tr>
+                            <th style="height: 40px" colspan="100%">
+                                <label for="SubmitCasaSMBtn" class="btn">Confirmer</label>
+                                <input form='statusFormCasaSM' style="display: none;" id="SubmitCasaSMBtn" type="submit" name="submit" value="casaSM">
+                            </th>
+                        </tr>
                         <tr>
                             <th colspan="100%">
                                 Place disponibles SM: {{ AVAILABLE_PLACES_SM['casa'] }}
@@ -291,11 +298,24 @@
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom }}</td>
                             <td>{{ row.moyenne }}</td>
+                            <td><select form="statusFormCasaSM" name="statusCasaSM">
+                                <option disabled selected value>--SELECT--</option>
+                                <option value="c.{{row.cne}}">Confirmé</option>
+                                <option value="a.{{row.cne}}"+>Absent</option>
+                              </select>
+                            </td>
                         </tr>
-                        {% endfor %}
+                        {% endfor %}                        
                     </table>
-
+                    
+                    <form action="statusStudents" method="post" id='statusFormCasaSP'></form>
                     <table class="table nodisp" id='laCasaSP'>
+                        <tr>
+                            <th style="height: 40px" colspan="100%">
+                                <label for="SubmitCasaSPBtn" class="btn">Confirmer</label>
+                                <input form='statusFormCasaSP' style="display: none;" id="SubmitCasaSPBtn" type="submit" name="submit" value="casaSP">  
+                           </th>
+                        </tr>
                         <tr>
                             <th colspan="100%">
                                 Place disponibles SP: {{ AVAILABLE_PLACES_SP['casa'] }}
@@ -315,8 +335,13 @@
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom }}</td>
                             <td>{{ row.moyenne }}</td>
-                        </tr>
-                        {% endfor %}
+                            <td><select form='statusFormCasaSP' name="statusCasaSP">
+                                <option disabled selected value>--SELECT--</option>
+                                <option value="c.{{row.cne}}">Confirmé</option>
+                                <option value="a.{{row.cne}}"+>Absent</option>
+                              </select>
+                            </td>                        </tr>
+                        {% endfor %}                        
                     </table>
             {% endif %}
             </div>
@@ -328,6 +353,13 @@
                         <button class='btn' id="LAMeknesSPButton">SP</button>
                     </div>
                     <table class="table" id="laMeknesSM">
+                        <form action="statusStudents" method="post" id='statusFormMeknesSM'></form>
+                        <tr>
+                            <th style="height: 40px" colspan="100%">
+                                <label for="SubmitMeknesSMBtn" class="btn">Confirmer</label>
+                                <input form='statusFormMeknesSM' style="display: none;" id="SubmitMeknesSMBtn" type="submit" name="submit" value="meknesSM">
+                            </th>
+                        </tr>
                         <tr>
                             <th colspan="100%">
                                 Place disponibles SM: {{ AVAILABLE_PLACES_SM['meknes'] }}
@@ -347,11 +379,23 @@
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom}}</td>
                             <td>{{ row.moyenne}}</td>
-                        </tr>
+                            <td><select form='statusFormMeknesSM' name="statusMeknesSM">
+                                <option disabled selected value>--SELECT--</option>
+                                <option value="c.{{row.cne}}">Confirmé</option>
+                                <option value="a.{{row.cne}}"+>Absent</option>
+                              </select>
+                            </td>                        </tr>
                         {% endfor %}
                     </table>
 
                     <table class="table nodisp" id="laMeknesSP">
+                        <form action="statusStudents" method="post" id='statusFormMeknesSP'></form>
+                        <tr>
+                            <th style="height: 40px" colspan="100%">
+                                <label for="SubmitMeknesSPBtn" class="btn">Confirmer</label>
+                                <input form='statusFormMeknesSP' style="display: none;" id="SubmitMeknesSPBtn" type="submit" name="submit" value="meknesSP">
+                            </th>
+                        </tr>
                         <tr>
                             <th colspan="100%">
                                 Place disponibles SP: {{ AVAILABLE_PLACES_SP['meknes'] }}
@@ -371,7 +415,12 @@
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom}}</td>
                             <td>{{ row.moyenne}}</td>
-                        </tr>
+                            <td><select form='statusFormMeknesSP' name="statusMeknesSP">
+                                <option disabled selected value>--SELECT--</option>
+                                <option value="c.{{row.cne}}">Confirmé</option>
+                                <option value="a.{{row.cne}}"+>Absent</option>
+                              </select>
+                            </td>                        </tr>
                         {% endfor %}
                     </table>
             {% endif %}
@@ -384,6 +433,13 @@
                         <button class='btn' id="LARabatSPButton">SP</button>
                     </div>
                     <table class="table" id='laRabatSM'>
+                        <form action="statusStudents" method="post" id='statusFormRabatSM'></form>
+                        <tr>
+                            <th style="height: 40px" colspan="100%">
+                                <label for="SubmitRabatSMBtn" class="btn">Confirmer</label>
+                                <input form='statusFormRabatSM' style="display: none;" id="SubmitRabatSMBtn" type="submit" name="submit" value="rabatSM">
+                            </th>
+                        </tr>
                         <tr>
                             <th colspan="100%">
                                 Place disponibles SM: {{ AVAILABLE_PLACES_SM['rabat'] }}
@@ -403,11 +459,23 @@
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom}}</td>
                             <td>{{ row.moyenne}}</td>
-                        </tr>
+                            <td><select form='statusFormRabatSM' name="statusRabatSM">
+                                <option disabled selected value>--SELECT--</option>
+                                <option value="c.{{row.cne}}">Confirmé</option>
+                                <option value="a.{{row.cne}}"+>Absent</option>
+                              </select>
+                            </td>                        </tr>
                         {% endfor %}
                     </table>
 
                     <table class="table nodisp" id='laRabatSP'>
+                        <form action="statusStudents" method="post" id='statusFormRabatSP'></form>
+                        <tr>
+                            <th style="height: 40px" colspan="100%">
+                                <label for="SubmitRabatSPBtn" class="btn">Confirmer</label>
+                                <input form='statusFormRabatSP' style="display: none;" id="SubmitRabatSPBtn" type="submit" name="submit" value="rabatSP">
+                            </th>
+                        </tr>
                         <tr>
                             <th colspan="100%">
                                 Place disponibles SP: {{ AVAILABLE_PLACES_SP['rabat'] }}
@@ -427,6 +495,12 @@
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom}}</td>
                             <td>{{ row.moyenne}}</td>
+                            <td><select form='statusFormRabatSP' name="statusRabatSP">
+                                <option disabled selected value>--SELECT--</option>
+                                <option value="c.{{row.cne}}">Confirmé</option>
+                                <option value="a.{{row.cne}}"+>Absent</option>
+                              </select>
+                            </td>
                         </tr>
                         {% endfor %}
                     </table>
