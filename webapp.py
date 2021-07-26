@@ -626,23 +626,6 @@ def getFile():
     except FileNotFoundError:
         abort(404)           
 
-@app.route('/genererpasswords')
-def passwd():
-    passwordCasa = 'a47CyM&z4UkD'
-    passwordMeknes = 'HkT6Hy!ZrV4!'
-    passwordRabat = '8j5$TzCpD^s@'
-    passwordAdmin = 'WpNZ$6huF^GZ$k5S!8O2Hbzebg'
-    Casa = User(username='ENSAM_Casa', password=generate_password_hash(passwordCasa))
-    Meknes = User(username='ENSAM_Meknes', password=generate_password_hash(passwordMeknes))
-    Rabat = User(username='ENSAM_Rabat', password=generate_password_hash(passwordRabat))
-    Admin = User(username='admin', password=generate_password_hash(passwordAdmin))
-    db.session.add(Casa)
-    db.session.add(Meknes)
-    db.session.add(Rabat)
-    db.session.add(Admin)
-    db.session.commit()
-    return redirect('/')
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
