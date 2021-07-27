@@ -47,3 +47,20 @@ if (document.querySelector('#LARabatSPButton')) {
         LARabatSP.classList.remove('nodisp');
     });
 }
+
+Pourcentage = document.querySelector('#genererLPForm')
+pdp = document.querySelector('#genererLPForm2')
+
+if(document.querySelector('#Pourcentage')){
+    document.querySelector('#Pourcentage').addEventListener('click', () => {
+        Pourcentage.classList.remove('nodisp');
+        pdp.classList.add('nodisp');
+    });
+}
+
+if (document.querySelector('#ParMerite')) {
+    document.querySelector('#ParMerite').addEventListener('click', () => {
+        Pourcentage.classList.add('nodisp');
+        pdp.classList.remove('nodisp');
+    });
+}

@@ -16,11 +16,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user, login_user
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-from config import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, CHOICE_CODES, SECRET_KEY, ENSAM_CODES
+from config import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, CHOICE_CODES, SECRET_KEY, ENSAM_CODES, CODES_FILIERES_SM
 from models import Results, ResultsSP, LPCasa, LPMeknes, LPRabat, LACasa, LAMeknes, LARabat, LACasaSP, LAMeknesSP, LARabatSP, User, LoginForm, db
 import pymysql 
 pymysql.install_as_MySQLdb()
-
+ 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/assignementplatform' 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -139,52 +139,63 @@ def uploadResults():
                 elif fileExtension(filename) == 'csv':
                     resultsDf = pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'], 'results.csv'), names=['CNE', 'NOM', 'Choix 1', 'Choix 2', 'Choix 3', 'Moyenne'])
                 
-                resultsDf = resultsDf[['CNE', 'NOM', 'Choix 1', 'Choix 2', 'Choix 3', 'FILIERE', 'Note Maths', 'Note Physique', 'Moyenne']]
+                resultsDf = resultsDf[['CNE', 'NOM', 'PRENOM', 'Choix 1', 'Choix 2', 'Choix 3', 'FILIERE', 'CD_FILIERE', 'Moyenne']]
                 
-                resultsDf = resultsDf.rename(columns={'CNE':'cne', 'NOM':'nomPrenom', 'Choix 1':'choix1', 'Choix 2':'choix2', 'Choix 3':'choix3', 'FILIERE': 'filiere', 'Note Maths':'noteMaths', 'Note Physique':'notePhysique', 'Moyenne':'moyenne'})
-                resultsDf.dropna(subset=['cne', 'nomPrenom', 'moyenne', 'choix1', 'choix2', 'choix3'], inplace=True)
-                resultsDf.sort_values(by=['moyenne'], inplace=True, ascending=False)
-                resultsDf['branche']='SM'
-                resultsDf.to_sql('results', con=db.engine, index=False, if_exists='replace')
-
-                return redirect('/')
-
-@app.route('/uploadResultsSP', methods=['POST'])
-def uploadResultsSP():
-    if current_user.is_authenticated:
-        if request.method == 'POST':
-            if 'resultsSP' not in request.files:
-                return redirect('/')
-            file = request.files['resultsSP']
-            if file.filename == '':
-                return redirect('/')
-            if file and allowedFile(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'resultsSP.'+fileExtension(filename)))
-                if fileExtension(filename) == 'xlsx':
-                    resultsDf = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], 'resultsSP.xlsx'))
-                elif fileExtension(filename) == 'csv':
-                    resultsDf = pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'], 'resultsSP.csv'), names=['CNE', 'NOM', 'Choix 1', 'Choix 2', 'Choix 3', 'FILIERE', 'Note Maths', 'Note Physique','Moyenne'])
+                resultsDf = resultsDf.rename(columns={'CNE':'cne', 'NOM':'nom', 'PRENOM':'prenom', 'Choix 1':'choix1', 'CD_FILIERE':'cdFiliere', 'Choix 2':'choix2', 'Choix 3':'choix3', 'FILIERE': 'filiere', 'Moyenne':'moyenne'})
+                resultsDf.dropna(subset=['cne', 'nom', 'prenom', 'moyenne', 'choix1', 'choix2', 'choix3', 'cdFiliere'], inplace=True)
+                resultsDf['nomPrenom'] = resultsDf['nom'] + ' ' + resultsDf['prenom']
+                resultsDf.drop(columns=['nom', 'prenom'], inplace=True)
                 
-                resultsDf = resultsDf[['CNE', 'NOM', 'Choix 1', 'Choix 2', 'Choix 3', 'FILIERE', 'Note Maths', 'Note Physique', 'Moyenne']]
-                
-                resultsDf = resultsDf.rename(columns={'CNE':'cne', 'NOM':'nomPrenom', 'Choix 1':'choix1', 'Choix 2':'choix2', 'Choix 3':'choix3', 'FILIERE': 'filiere', 'Note Maths':'noteMaths', 'Note Physique':'notePhysique', 'Moyenne':'moyenne'})
-                resultsDf.dropna(subset=['cne', 'nomPrenom', 'moyenne', 'choix1', 'choix2', 'choix3'], inplace=True)
-                resultsDf.sort_values(by=['moyenne'], inplace=True, ascending=False)
-                resultsDf['branche']='SP'
-                resultsDf.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
+                resultsDf['status'] = 0
+                resultsSM = resultsDf[resultsDf["cdFiliere"].isin(CODES_FILIERES_SM)]
+                resultsSM.sort_values(by=['moyenne'], inplace=True, ascending=False)
+                resultsSM.to_sql('results', con=db.engine, index=False, if_exists='replace')
 
-                return redirect('/')
+                resultsSP = resultsDf[~resultsDf["cdFiliere"].isin(CODES_FILIERES_SM)]
+                resultsSP.sort_values(by=['moyenne'], inplace=True, ascending=False)
+                resultsSP.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
+                
+                return redirect('/') 
 
 @app.route('/confirmStudents', methods=['POST'])
 def confirmStudents():
     if current_user.is_authenticated:
         if request.form['submit'] == 'casa':
             lp = pd.read_sql('SELECT * FROM lp_casa', con=db.engine)
+            ResultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
+            Results = pd.read_sql('SELECT * FROM results', con=db.engine)
+
             confirmed = request.form.getlist('confirmedCasa')
             lp['confirmed'] = False
             lp.loc[lp.cne.isin(confirmed), 'confirmed'] = True
             lp.to_sql('lp_casa', con=db.engine, index=False, if_exists='replace')
+            ###
+            ##
+            #
+            #do the reallocation
+            #remove all confirmed members that were accepted in the LP
+            holder=lp[lp['confirmed'] == True]
+            for index, row in holder.iterrows():
+                if row['choix1'] != ENSAM_CODES['casa']:
+                    holder = holder.drop(index)
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+
+            holder=lp[lp['confirmed'] == False]
+
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+            Results.to_sql('results', con=db.engine, index=False, if_exists='replace')
+            ResultsSP.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
+
+            
+
+
+            
         elif request.form['submit'] == 'meknes':
             lp = pd.read_sql('SELECT * FROM lp_meknes', con=db.engine)
             confirmed = request.form.getlist('confirmedMeknes')
@@ -198,7 +209,7 @@ def confirmStudents():
             lp.loc[lp.cne.isin(confirmed), 'confirmed'] = True
             lp.to_sql('lp_rabat', con=db.engine, index=False, if_exists='replace')
     
-    return redirect('/genererLA')
+    return redirect('/')
 
 @app.route('/statusStudents', methods=['POST'])
 def statusStudents():
@@ -312,113 +323,84 @@ def statusStudents():
 
 @app.route('/genererLA', methods=['GET', 'POST'])
 def genererLA():
-    if current_user.is_authenticated:
-        listesAttentes = {'casa':[], 'meknes':[], 'rabat':[]}
-        listesAttentesSP = {'casa':[], 'meknes':[], 'rabat':[]}
-        listesPrincipales = {'casa':pd.read_sql('SELECT * FROM lp_casa', con=db.engine), 'meknes':pd.read_sql('SELECT * FROM lp_meknes', con=db.engine), 'rabat':pd.read_sql('SELECT * FROM lp_rabat', con=db.engine)}
-        listesReaffectationSM = {}
-        listesReaffectationSP = {}
-        results = pd.read_sql('SELECT * FROM results', con=db.engine)
-        resultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
-        choiceCodes = CHOICE_CODES
-        AVAILABLE_PLACES_SM = {'casa':0, 'meknes':0, 'rabat':0}
-        AVAILABLE_PLACES_SP = {'casa':0, 'meknes':0, 'rabat':0}
+#     if current_user.is_authenticated:
+#         listesAttentes = {'casa':[], 'meknes':[], 'rabat':[]}
+#         listesAttentesSP = {'casa':[], 'meknes':[], 'rabat':[]}
+#         listesPrincipales = {'casa':pd.read_sql('SELECT * FROM lp_casa', con=db.engine), 'meknes':pd.read_sql('SELECT * FROM lp_meknes', con=db.engine), 'rabat':pd.read_sql('SELECT * FROM lp_rabat', con=db.engine)}
+#         listesReaffectationSM = {}
+#         listesReaffectationSP = {}
+#         results = pd.read_sql('SELECT * FROM results', con=db.engine)
+#         resultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
+#         choiceCodes = CHOICE_CODES
+#         AVAILABLE_PLACES_SM = {'casa':0, 'meknes':0, 'rabat':0}
+#         AVAILABLE_PLACES_SP = {'casa':0, 'meknes':0, 'rabat':0}
         
-        maxAdmisSP = 0
-        maxAdmisSM = 0
-        origin=[]
-        for key in listesPrincipales:
-            listesReaffectationSM[key] = listesPrincipales[key][(listesPrincipales[key]['confirmed']==True) & (listesPrincipales[key]['branche']=='SM')]
-            listesReaffectationSP[key] = listesPrincipales[key][(listesPrincipales[key]['confirmed']==True) & (listesPrincipales[key]['branche']=='SP')]
-            listesReaffectationSM[key]['origin'] = key
-            listesReaffectationSP[key]['origin'] = key
-            maxAdmisSM += len(listesPrincipales[key][listesPrincipales[key]['branche'] == 'SM'].index)
-            maxAdmisSP += len(listesPrincipales[key][listesPrincipales[key]['branche'] == 'SP'].index)
+#         maxAdmisSP = 0
+#         maxAdmisSM = 0
+#         origin=[]
+#         for key in listesPrincipales:
+#             listesReaffectationSM[key] = listesPrincipales[key][(listesPrincipales[key]['confirmed']==True) & (listesPrincipales[key]['branche']=='SM')]
+#             listesReaffectationSP[key] = listesPrincipales[key][(listesPrincipales[key]['confirmed']==True) & (listesPrincipales[key]['branche']=='SP')]
+#             listesReaffectationSM[key]['origin'] = key
+#             listesReaffectationSP[key]['origin'] = key
+#             maxAdmisSM += len(listesPrincipales[key][listesPrincipales[key]['branche'] == 'SM'].index)
+#             maxAdmisSP += len(listesPrincipales[key][listesPrincipales[key]['branche'] == 'SP'].index)
         
-        for key in AVAILABLE_PLACES_SM:
-            AVAILABLE_PLACES_SM[key] = len(listesPrincipales[key][listesPrincipales[key]['branche'] == 'SM'].index)-len(listesReaffectationSM[key].index)
+#         for key in AVAILABLE_PLACES_SM:
+#             AVAILABLE_PLACES_SM[key] = len(listesPrincipales[key][listesPrincipales[key]['branche'] == 'SM'].index)-len(listesReaffectationSM[key].index)
             
-        for key in AVAILABLE_PLACES_SP:
-            AVAILABLE_PLACES_SP[key] = len(listesPrincipales[key][listesPrincipales[key]['branche'] == 'SP'].index)-len(listesReaffectationSP[key].index)
+#         for key in AVAILABLE_PLACES_SP:
+#             AVAILABLE_PLACES_SP[key] = len(listesPrincipales[key][listesPrincipales[key]['branche'] == 'SP'].index)-len(listesReaffectationSP[key].index)
         
-        #do the reallocation
-            #remove all confirmed members that were accepted in the LP
-        for key in listesReaffectationSM:
-            for index, row in listesReaffectationSM[key].iterrows():
-                if row['choix1'] == ENSAM_CODES[key]:
-                    listesReaffectationSM[key] = listesReaffectationSM[key].drop(index)
-        reaffectedDF = pd.concat([listesReaffectationSM['casa'], listesReaffectationSM['meknes'], listesReaffectationSM['rabat']], ignore_index=True)
-        reaffectedDF = reaffectedDF.sort_values(by=['moyenne'], ascending=False)
+#         #do the reallocation
+#             #remove all confirmed members that were accepted in the LP
+#         for key in listesReaffectationSM:
+#             for index, row in listesReaffectationSM[key].iterrows():
+#                 if row['choix1'] == ENSAM_CODES[key]:
+#                     listesReaffectationSM[key] = listesReaffectationSM[key].drop(index)
+#         reaffectedDF = pd.concat([listesReaffectationSM['casa'], listesReaffectationSM['meknes'], listesReaffectationSM['rabat']], ignore_index=True)
+#         reaffectedDF = reaffectedDF.sort_values(by=['moyenne'], ascending=False)
         
-        for key in listesReaffectationSP:
-            for index, row in listesReaffectationSP[key].iterrows():
-                if row['choix1'] == ENSAM_CODES[key]:
-                    listesReaffectationSP[key] = listesReaffectationSP[key].drop(index)
-        reaffectedDFSP = pd.concat([listesReaffectationSP['casa'], listesReaffectationSP['meknes'], listesReaffectationSP['rabat']], ignore_index=True)
-        reaffectedDFSP = reaffectedDFSP.sort_values(by=['moyenne'], ascending=False)
+#         for key in listesReaffectationSP:
+#             for index, row in listesReaffectationSP[key].iterrows():
+#                 if row['choix1'] == ENSAM_CODES[key]:
+#                     listesReaffectationSP[key] = listesReaffectationSP[key].drop(index)
+#         reaffectedDFSP = pd.concat([listesReaffectationSP['casa'], listesReaffectationSP['meknes'], listesReaffectationSP['rabat']], ignore_index=True)
+#         reaffectedDFSP = reaffectedDFSP.sort_values(by=['moyenne'], ascending=False)
         
-        for index, row in reaffectedDF.iterrows():
-                if AVAILABLE_PLACES_SM[choiceCodes[row['choix1']]] > 0:
-                    listesAttentes[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
-                    AVAILABLE_PLACES_SM[choiceCodes[row['choix1']]]-=1
-                    AVAILABLE_PLACES_SM[row['origin']]+=1            
-                elif AVAILABLE_PLACES_SM[choiceCodes[row['choix2']]]>0:            
-                    listesAttentes[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
-                    AVAILABLE_PLACES_SM[choiceCodes[row['choix2']]]-=1   
-                    AVAILABLE_PLACES_SM[row['origin']]+=1            
-                elif AVAILABLE_PLACES_SM[choiceCodes[row['choix3']]]>0:             
-                    listesAttentes[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
-                    AVAILABLE_PLACES_SM[choiceCodes[row['choix3']]]-=1 
-                    AVAILABLE_PLACES_SM[row['origin']]+=1            
-                else:
-                    break
+#         for index, row in reaffectedDF.iterrows():
+#                 if AVAILABLE_PLACES_SM[choiceCodes[row['choix1']]] > 0:
+#                     listesAttentes[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
+#                     AVAILABLE_PLACES_SM[choiceCodes[row['choix1']]]-=1
+#                     AVAILABLE_PLACES_SM[row['origin']]+=1            
+#                 elif AVAILABLE_PLACES_SM[choiceCodes[row['choix2']]]>0:            
+#                     listesAttentes[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
+#                     AVAILABLE_PLACES_SM[choiceCodes[row['choix2']]]-=1   
+#                     AVAILABLE_PLACES_SM[row['origin']]+=1            
+#                 elif AVAILABLE_PLACES_SM[choiceCodes[row['choix3']]]>0:             
+#                     listesAttentes[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
+#                     AVAILABLE_PLACES_SM[choiceCodes[row['choix3']]]-=1 
+#                     AVAILABLE_PLACES_SM[row['origin']]+=1            
+#                 else:
+#                     break
         
-        for index, row in reaffectedDFSP.iterrows():
-                if AVAILABLE_PLACES_SP[choiceCodes[row['choix1']]] > 0:
-                    listesAttentesSP[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
-                    AVAILABLE_PLACES_SP[choiceCodes[row['choix1']]]-=1
-                    AVAILABLE_PLACES_SP[row['origin']]+=1            
-                elif AVAILABLE_PLACES_SP[choiceCodes[row['choix2']]]>0:            
-                    listesAttentesSP[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
-                    AVAILABLE_PLACES_SP[choiceCodes[row['choix2']]]-=1   
-                    AVAILABLE_PLACES_SP[row['origin']]+=1            
-                elif AVAILABLE_PLACES_SP[choiceCodes[row['choix3']]]>0:             
-                    listesAttentesSP[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
-                    AVAILABLE_PLACES_SP[choiceCodes[row['choix3']]]-=1 
-                    AVAILABLE_PLACES_SP[row['origin']]+=1            
-                else:
-                    break
-        
-        print(AVAILABLE_PLACES_SM)
-        print(AVAILABLE_PLACES_SP)
-        
-        listeAttenteDf = results.drop(index=results.index[:maxAdmisSM],axis=0)
-        for index, row in listeAttenteDf.iterrows():
-            listesAttentes[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
-        
-        listeAttenteDfSP = resultsSP.drop(index=resultsSP.index[:maxAdmisSP],axis=0)
-        for index, row in listeAttenteDfSP.iterrows():
-            listesAttentesSP[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
-        
-        for key in listesAttentes:
-                listesAttentes[key]=pd.DataFrame(listesAttentes[key])
-                listesAttentes[key]['status']=0
-                listesAttentes[key].to_sql('la_'+key, con=db.engine, index=False, if_exists='replace')
-        
-        for key in listesAttentesSP:
-                listesAttentesSP[key]=pd.DataFrame(listesAttentesSP[key])
-                listesAttentesSP[key]['status']=0
-                listesAttentesSP[key].to_sql('la_'+key+'sp', con=db.engine, index=False, if_exists='replace')
-        
-        app.config['AVAILABLE_PLACES_SM'] = AVAILABLE_PLACES_SM
-        app.config['AVAILABLE_PLACES_SP'] = AVAILABLE_PLACES_SP
-        
-        return redirect('/')
-
-@app.route('/genererLP', methods=['POST'])
-def genererLP():
+#         for index, row in reaffectedDFSP.iterrows():
+#                 if AVAILABLE_PLACES_SP[choiceCodes[row['choix1']]] > 0:
+#                     listesAttentesSP[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
+#                     AVAILABLE_PLACES_SP[choiceCodes[row['choix1']]]-=1
+#                     AVAILABLE_PLACES_SP[row['origin']]+=1            
+#                 elif AVAILABLE_PLACES_SP[choiceCodes[row['choix2']]]>0:            
+#                     listesAttentesSP[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
+#                     AVAILABLE_PLACES_SP[choiceCodes[row['choix2']]]-=1   
+#                     AVAILABLE_PLACES_SP[row['origin']]+=1            
+#                 elif AVAILABLE_PLACES_SP[choiceCodes[row['choix3']]]>0:             
+#                     listesAttentesSP[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne']})
+#                     AVAILABLE_PLACES_SP[choiceCodes[row['choix3']]]-=1 
+#                     AVAILABLE_PLACES_SP[row['origin']]+=1            
+#                 else:
+#                     break
     if current_user.is_authenticated:
-        if request.method == 'POST':
+        if request.form.get('genererLP') == 'P':
             colNames = ['cne', 'nomPrenom', 'choix1', 'choix2', 'choix3', 'filiere', 'noteMaths', 'notePhysique', 'moyenne']
             PERCENTAGE = {'casa':float(request.form.get('CASA_RANGE')), 'meknes':float(request.form.get('MEKNES_RANGE')), 'rabat':float(request.form.get('RABAT_RANGE'))}
             AVAILABLE_PLACES_SM = {'casa':ceil(int(request.form.get('CASA_MAX_PLACES'))*PERCENTAGE['casa']), 'meknes':ceil(int(request.form.get('MEKNES_MAX_PLACES'))*PERCENTAGE['meknes']), 'rabat':ceil(int(request.form.get('RABAT_MAX_PLACES'))*PERCENTAGE['rabat'])}
@@ -427,8 +409,105 @@ def genererLP():
             indexes={'casa':0, 'meknes':0, 'rabat':0} 
             choiceCodes=CHOICE_CODES
             
-            print(AVAILABLE_PLACES_SM)
-            print(AVAILABLE_PLACES_SP)
+            resultsSM = pd.read_sql('SELECT * FROM results WHERE results.status=0', con=db.engine)
+            resultsSP = pd.read_sql('SELECT * FROM results_sp WHERE results_sp.status=0', con=db.engine)
+            
+            resultsSM.sort_values(by=['moyenne'], inplace=True, ascending=False)
+            resultsSM.dropna(subset=['cne', 'nomPrenom', 'moyenne', 'choix1', 'choix2', 'choix3'], inplace=True)
+            
+            resultsSP.sort_values(by=['moyenne'], inplace=True, ascending=False)
+            resultsSP.dropna(subset=['cne', 'nomPrenom', 'moyenne', 'choix1', 'choix2', 'choix3'], inplace=True)
+            nbEtudiants = len(resultsSM.index)+len(resultsSP.index)
+            
+            for index, row in resultsSM.iterrows():
+                if AVAILABLE_PLACES_SM[choiceCodes[row['choix1']]] > 0:
+                    listesPrincipales[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES_SM[choiceCodes[row['choix1']]]-=1
+                    indexes[choiceCodes[row['choix1']]]+=1                
+                elif AVAILABLE_PLACES_SM[choiceCodes[row['choix2']]]>0:            
+                    listesPrincipales[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES_SM[choiceCodes[row['choix2']]]-=1
+                    indexes[choiceCodes[row['choix2']]]+=1    
+                elif AVAILABLE_PLACES_SM[choiceCodes[row['choix3']]]>0:             
+                    listesPrincipales[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES_SM[choiceCodes[row['choix3']]]-=1
+                    indexes[choiceCodes[row['choix3']]]+=1  
+                else:
+                    break
+                
+            for index, row in resultsSP.iterrows():
+                if AVAILABLE_PLACES_SP[choiceCodes[row['choix1']]] > 0:
+                    listesPrincipales[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES_SP[choiceCodes[row['choix1']]]-=1
+                    indexes[choiceCodes[row['choix1']]]+=1                
+                elif AVAILABLE_PLACES_SP[choiceCodes[row['choix2']]]>0:            
+                    listesPrincipales[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES_SP[choiceCodes[row['choix2']]]-=1
+                    indexes[choiceCodes[row['choix2']]]+=1    
+                elif AVAILABLE_PLACES_SP[choiceCodes[row['choix3']]]>0:             
+                    listesPrincipales[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES_SP[choiceCodes[row['choix3']]]-=1
+                    indexes[choiceCodes[row['choix3']]]+=1  
+                else:
+                    break
+            
+            for key in listesPrincipales:
+                listesPrincipales[key]=pd.DataFrame(listesPrincipales[key])
+                listesPrincipales[key]['confirmed'] = False
+                listesPrincipales[key].to_sql('lp_'+key, con=db.engine, index=False, if_exists='replace')
+                
+            print('PPPPP')
+            return redirect('/')
+        elif request.form.get('genererLP') == 'NP':
+            colNames = ['cne', 'nomPrenom', 'choix1', 'choix2', 'choix3', 'filiere', 'noteMaths', 'notePhysique', 'moyenne']
+            AVAILABLE_PLACES = {'casa':ceil(int(request.form.get('CASA_MAX_PLACES2'))), 'meknes':ceil(int(request.form.get('MEKNES_MAX_PLACES2'))), 'rabat':ceil(int(request.form.get('RABAT_MAX_PLACES2')))}           
+            listesPrincipales = {'casa':[], 'meknes':[], 'rabat':[]}
+            indexes={'casa':0, 'meknes':0, 'rabat':0} 
+            choiceCodes=CHOICE_CODES
+            
+            resultsSM = pd.read_sql('SELECT * FROM results WHERE results.status=0', con=db.engine)
+            resultsSP = pd.read_sql('SELECT * FROM results_sp WHERE results_sp.status=0', con=db.engine)
+            
+            resultsDf = pd.concat([resultsSM, resultsSP], ignore_index=True)
+            
+            resultsDf.sort_values(by=['moyenne'], inplace=True, ascending=False)
+            resultsDf.dropna(subset=['cne', 'nomPrenom', 'moyenne', 'choix1', 'choix2', 'choix3'], inplace=True)
+            nbEtudiants = len(resultsSM.index)+len(resultsSP.index)
+            
+            for index, row in resultsDf.iterrows():
+                if AVAILABLE_PLACES[choiceCodes[row['choix1']]] > 0:
+                    listesPrincipales[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES[choiceCodes[row['choix1']]]-=1
+                    indexes[choiceCodes[row['choix1']]]+=1                
+                elif AVAILABLE_PLACES[choiceCodes[row['choix2']]]>0:            
+                    listesPrincipales[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES[choiceCodes[row['choix2']]]-=1
+                    indexes[choiceCodes[row['choix2']]]+=1    
+                elif AVAILABLE_PLACES[choiceCodes[row['choix3']]]>0:             
+                    listesPrincipales[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES[choiceCodes[row['choix3']]]-=1
+                    indexes[choiceCodes[row['choix3']]]+=1  
+                else:
+                    break
+            
+            for key in listesPrincipales:
+                listesPrincipales[key]=pd.DataFrame(listesPrincipales[key])
+                listesPrincipales[key]['confirmed'] = False
+                listesPrincipales[key].to_sql('lp_'+key, con=db.engine, index=False, if_exists='replace')
+            
+            return redirect('/')          
+
+@app.route('/genererLP', methods=['POST'])
+def genererLP():
+    if current_user.is_authenticated:
+        if request.form.get('genererLP') == 'P':
+            colNames = ['cne', 'nomPrenom', 'choix1', 'choix2', 'choix3', 'filiere', 'noteMaths', 'notePhysique', 'moyenne']
+            PERCENTAGE = {'casa':float(request.form.get('CASA_RANGE')), 'meknes':float(request.form.get('MEKNES_RANGE')), 'rabat':float(request.form.get('RABAT_RANGE'))}
+            AVAILABLE_PLACES_SM = {'casa':ceil(int(request.form.get('CASA_MAX_PLACES'))*PERCENTAGE['casa']), 'meknes':ceil(int(request.form.get('MEKNES_MAX_PLACES'))*PERCENTAGE['meknes']), 'rabat':ceil(int(request.form.get('RABAT_MAX_PLACES'))*PERCENTAGE['rabat'])}
+            AVAILABLE_PLACES_SP = {'casa':ceil(int(request.form.get('CASA_MAX_PLACES'))*(1-PERCENTAGE['casa'])), 'meknes':ceil(int(request.form.get('MEKNES_MAX_PLACES'))*(1-PERCENTAGE['meknes'])), 'rabat':ceil(int(request.form.get('RABAT_MAX_PLACES'))*(1-PERCENTAGE['rabat']))}            
+            listesPrincipales = {'casa':[], 'meknes':[], 'rabat':[]}
+            indexes={'casa':0, 'meknes':0, 'rabat':0} 
+            choiceCodes=CHOICE_CODES
             
             resultsSM = pd.read_sql('SELECT * FROM results', con=db.engine)
             resultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
@@ -442,15 +521,15 @@ def genererLP():
             
             for index, row in resultsSM.iterrows():
                 if AVAILABLE_PLACES_SM[choiceCodes[row['choix1']]] > 0:
-                    listesPrincipales[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne'], 'branche': row['branche']})
+                    listesPrincipales[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
                     AVAILABLE_PLACES_SM[choiceCodes[row['choix1']]]-=1
                     indexes[choiceCodes[row['choix1']]]+=1                
                 elif AVAILABLE_PLACES_SM[choiceCodes[row['choix2']]]>0:            
-                    listesPrincipales[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne'], 'branche': row['branche']})
+                    listesPrincipales[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
                     AVAILABLE_PLACES_SM[choiceCodes[row['choix2']]]-=1
                     indexes[choiceCodes[row['choix2']]]+=1    
                 elif AVAILABLE_PLACES_SM[choiceCodes[row['choix3']]]>0:             
-                    listesPrincipales[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne'], 'branche': row['branche']})
+                    listesPrincipales[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
                     AVAILABLE_PLACES_SM[choiceCodes[row['choix3']]]-=1
                     indexes[choiceCodes[row['choix3']]]+=1  
                 else:
@@ -458,15 +537,15 @@ def genererLP():
                 
             for index, row in resultsSP.iterrows():
                 if AVAILABLE_PLACES_SP[choiceCodes[row['choix1']]] > 0:
-                    listesPrincipales[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne'], 'branche': row['branche']})
+                    listesPrincipales[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
                     AVAILABLE_PLACES_SP[choiceCodes[row['choix1']]]-=1
                     indexes[choiceCodes[row['choix1']]]+=1                
                 elif AVAILABLE_PLACES_SP[choiceCodes[row['choix2']]]>0:            
-                    listesPrincipales[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne'], 'branche': row['branche']})
+                    listesPrincipales[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
                     AVAILABLE_PLACES_SP[choiceCodes[row['choix2']]]-=1
                     indexes[choiceCodes[row['choix2']]]+=1    
                 elif AVAILABLE_PLACES_SP[choiceCodes[row['choix3']]]>0:             
-                    listesPrincipales[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'noteMaths':row['noteMaths'], 'notePhysique':row['notePhysique'], 'moyenne':row['moyenne'], 'branche': row['branche']})
+                    listesPrincipales[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
                     AVAILABLE_PLACES_SP[choiceCodes[row['choix3']]]-=1
                     indexes[choiceCodes[row['choix3']]]+=1  
                 else:
@@ -476,7 +555,46 @@ def genererLP():
                 listesPrincipales[key]=pd.DataFrame(listesPrincipales[key])
                 listesPrincipales[key]['confirmed'] = False
                 listesPrincipales[key].to_sql('lp_'+key, con=db.engine, index=False, if_exists='replace')
-
+                
+            print('PPPPP')
+            return redirect('/')
+        elif request.form.get('genererLP') == 'NP':
+            colNames = ['cne', 'nomPrenom', 'choix1', 'choix2', 'choix3', 'filiere', 'noteMaths', 'notePhysique', 'moyenne']
+            AVAILABLE_PLACES = {'casa':ceil(int(request.form.get('CASA_MAX_PLACES2'))), 'meknes':ceil(int(request.form.get('MEKNES_MAX_PLACES2'))), 'rabat':ceil(int(request.form.get('RABAT_MAX_PLACES2')))}           
+            listesPrincipales = {'casa':[], 'meknes':[], 'rabat':[]}
+            indexes={'casa':0, 'meknes':0, 'rabat':0} 
+            choiceCodes=CHOICE_CODES
+            
+            resultsSM = pd.read_sql('SELECT * FROM results', con=db.engine)
+            resultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
+            
+            resultsDf = pd.concat([resultsSM, resultsSP], ignore_index=True)
+            
+            resultsDf.sort_values(by=['moyenne'], inplace=True, ascending=False)
+            resultsDf.dropna(subset=['cne', 'nomPrenom', 'moyenne', 'choix1', 'choix2', 'choix3'], inplace=True)
+            nbEtudiants = len(resultsSM.index)+len(resultsSP.index)
+            
+            for index, row in resultsDf.iterrows():
+                if AVAILABLE_PLACES[choiceCodes[row['choix1']]] > 0:
+                    listesPrincipales[choiceCodes[row['choix1']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES[choiceCodes[row['choix1']]]-=1
+                    indexes[choiceCodes[row['choix1']]]+=1                
+                elif AVAILABLE_PLACES[choiceCodes[row['choix2']]]>0:            
+                    listesPrincipales[choiceCodes[row['choix2']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES[choiceCodes[row['choix2']]]-=1
+                    indexes[choiceCodes[row['choix2']]]+=1    
+                elif AVAILABLE_PLACES[choiceCodes[row['choix3']]]>0:             
+                    listesPrincipales[choiceCodes[row['choix3']]].append({'cne': row['cne'], 'nomPrenom': row['nomPrenom'], 'choix1': row['choix1'], 'choix2': row['choix2'], 'choix3': row['choix3'], 'filiere':row['filiere'], 'moyenne':row['moyenne'], 'cdFiliere': row['cdFiliere']})
+                    AVAILABLE_PLACES[choiceCodes[row['choix3']]]-=1
+                    indexes[choiceCodes[row['choix3']]]+=1  
+                else:
+                    break
+            
+            for key in listesPrincipales:
+                listesPrincipales[key]=pd.DataFrame(listesPrincipales[key])
+                listesPrincipales[key]['confirmed'] = False
+                listesPrincipales[key].to_sql('lp_'+key, con=db.engine, index=False, if_exists='replace')
+            
             return redirect('/')
 
 @app.route('/downloadFiles')

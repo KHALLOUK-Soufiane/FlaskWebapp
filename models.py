@@ -15,9 +15,9 @@ class Results(db.Model):
     choix2 = db.Column(db.Integer)
     choix3 = db.Column(db.Integer) 
     filiere = db.Column(db.String)
-    noteMaths = db.Column(db.Float)
-    notePhysique = db.Column(db.Float)
+    cdFiliere = db.Column(db.String)
     moyenne = db.Column(db.Float)
+    status = db.Column(db.Integer)
     
 class ResultsSP(db.Model):
     __tablename__ = 'results_sp'
@@ -27,9 +27,9 @@ class ResultsSP(db.Model):
     choix2 = db.Column(db.Integer)
     choix3 = db.Column(db.Integer) 
     filiere = db.Column(db.String)
-    noteMaths = db.Column(db.Float)
-    notePhysique = db.Column(db.Float)
+    cdFiliere = db.Column(db.String)
     moyenne = db.Column(db.Float)
+    status = db.Column(db.Integer)
     
 class LPCasa(db.Model):
     __tablename__ = 'lp_casa'
@@ -39,8 +39,7 @@ class LPCasa(db.Model):
     choix2 = db.Column(db.Integer)
     choix3 = db.Column(db.Integer) 
     filiere = db.Column(db.String)
-    noteMaths = db.Column(db.Float)
-    notePhysique = db.Column(db.Float)
+    cdFiliere = db.Column(db.String)
     moyenne = db.Column(db.Float)
     confirmed = db.Column(db.Boolean, default=False)
 
@@ -52,8 +51,7 @@ class LPMeknes(db.Model):
     choix2 = db.Column(db.Integer)
     choix3 = db.Column(db.Integer) 
     filiere = db.Column(db.String)
-    noteMaths = db.Column(db.Float)
-    notePhysique = db.Column(db.Float)
+    cdFiliere = db.Column(db.String)
     moyenne = db.Column(db.Float)
     confirmed = db.Column(db.Boolean, default=False)
     
@@ -65,8 +63,7 @@ class LPRabat(db.Model):
     choix2 = db.Column(db.Integer)
     choix3 = db.Column(db.Integer) 
     filiere = db.Column(db.String)
-    noteMaths = db.Column(db.Float)
-    notePhysique = db.Column(db.Float)
+    cdFiliere = db.Column(db.String)
     moyenne = db.Column(db.Float)
     confirmed = db.Column(db.Boolean, default=False)
 
