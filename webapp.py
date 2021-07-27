@@ -400,7 +400,7 @@ def genererLA():
 #                 else:
 #                     break
     if current_user.is_authenticated:
-        if request.form.get('genererLP') == 'P':
+        if request.form.get('genererLA') == 'P':
             colNames = ['cne', 'nomPrenom', 'choix1', 'choix2', 'choix3', 'filiere', 'noteMaths', 'notePhysique', 'moyenne']
             PERCENTAGE = {'casa':float(request.form.get('CASA_RANGE')), 'meknes':float(request.form.get('MEKNES_RANGE')), 'rabat':float(request.form.get('RABAT_RANGE'))}
             AVAILABLE_PLACES_SM = {'casa':ceil(int(request.form.get('CASA_MAX_PLACES'))*PERCENTAGE['casa']), 'meknes':ceil(int(request.form.get('MEKNES_MAX_PLACES'))*PERCENTAGE['meknes']), 'rabat':ceil(int(request.form.get('RABAT_MAX_PLACES'))*PERCENTAGE['rabat'])}
