@@ -18,9 +18,11 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, CHOICE_CODES, SECRET_KEY, ENSAM_CODES
 from models import Results, ResultsSP, LPCasa, LPMeknes, LPRabat, LACasa, LAMeknes, LARabat, LACasaSP, LAMeknesSP, LARabatSP, User, LoginForm, db
- 
+import pymysql 
+pymysql.install_as_MySQLdb()
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/assignementplatform' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/assignementplatform' 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['AVAILABLE_PLACES_SM'] = 'NULL'
