@@ -100,12 +100,12 @@ def index():
             lp_casa = LPCasa.query.order_by(LPCasa.nomPrenom).all()
             lp_meknes = LPMeknes.query.order_by(LPMeknes.nomPrenom).all()
             lp_rabat = LPRabat.query.order_by(LPRabat.nomPrenom).all()
-            la_casa = LACasa.query.order_by(LACasa.moyenne.desc()).filter(LACasa.status == 0).all()
-            la_meknes = LAMeknes.query.order_by(LAMeknes.moyenne.desc()).filter(LAMeknes.status == 0).all()
-            la_rabat = LARabat.query.order_by(LARabat.moyenne.desc()).filter(LARabat.status == 0).all()
-            la_casasp = LACasaSP.query.order_by(LACasaSP.moyenne.desc()).filter(LACasaSP.status == 0).all()
-            la_meknessp = LAMeknesSP.query.order_by(LAMeknesSP.moyenne.desc()).filter(LAMeknesSP.status == 0).all()
-            la_rabatsp = LARabatSP.query.order_by(LARabatSP.moyenne.desc()).filter(LARabatSP.status == 0).all()
+            la_casa = LACasa.query.order_by(LACasa.moyenne.desc()).all()
+            la_meknes = LAMeknes.query.order_by(LAMeknes.moyenne.desc()).all()
+            la_rabat = LARabat.query.order_by(LARabat.moyenne.desc()).all()
+            la_casasp = LACasaSP.query.order_by(LACasaSP.moyenne.desc()).all()
+            la_meknessp = LAMeknesSP.query.order_by(LAMeknesSP.moyenne.desc()).all()
+            la_rabatsp = LARabatSP.query.order_by(LARabatSP.moyenne.desc()).all()
         except Exception as e:
             error_text = "<p>The error:<br>" + str(e) + "</p>"
             hed = '<h1>Something is broken.</h1>'
@@ -454,7 +454,7 @@ def genererLA():
             for key in listesPrincipales:
                 listesPrincipales[key]=pd.DataFrame(listesPrincipales[key])
                 listesPrincipales[key]['confirmed'] = False
-                listesPrincipales[key].to_sql('lp_'+key, con=db.engine, index=False, if_exists='replace')
+                listesPrincipales[key].to_sql('la_'+key, con=db.engine, index=False, if_exists='replace')
                 
             print('PPPPP')
             return redirect('/')
@@ -493,7 +493,7 @@ def genererLA():
             for key in listesPrincipales:
                 listesPrincipales[key]=pd.DataFrame(listesPrincipales[key])
                 listesPrincipales[key]['confirmed'] = False
-                listesPrincipales[key].to_sql('lp_'+key, con=db.engine, index=False, if_exists='replace')
+                listesPrincipales[key].to_sql('la_'+key, con=db.engine, index=False, if_exists='replace')
             
             return redirect('/')          
 

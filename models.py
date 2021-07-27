@@ -75,10 +75,9 @@ class LACasa(db.Model):
     choix2 = db.Column(db.Integer)
     choix3 = db.Column(db.Integer) 
     filiere = db.Column(db.String)
-    noteMaths = db.Column(db.Float)
-    notePhysique = db.Column(db.Float)
+    cdFiliere = db.Column(db.String)
     moyenne = db.Column(db.Float)
-    status = db.Column(db.Integer)
+    confirmed = db.Column(db.Boolean, default=False)
 
 class LAMeknes(db.Model):
     __tablename__ = 'la_meknes'
@@ -88,10 +87,9 @@ class LAMeknes(db.Model):
     choix2 = db.Column(db.Integer)
     choix3 = db.Column(db.Integer) 
     filiere = db.Column(db.String)
-    noteMaths = db.Column(db.Float)
-    notePhysique = db.Column(db.Float)
+    cdFiliere = db.Column(db.String)
     moyenne = db.Column(db.Float)
-    status = db.Column(db.Integer)
+    confirmed = db.Column(db.Boolean, default=False)
     
 class LARabat(db.Model):
     __tablename__ = 'la_rabat'
@@ -101,10 +99,9 @@ class LARabat(db.Model):
     choix2 = db.Column(db.Integer)
     choix3 = db.Column(db.Integer) 
     filiere = db.Column(db.String)
-    noteMaths = db.Column(db.Float)
-    notePhysique = db.Column(db.Float)
+    cdFiliere = db.Column(db.String)
     moyenne = db.Column(db.Float)
-    status = db.Column(db.Integer)
+    confirmed = db.Column(db.Boolean, default=False)
 
 class LACasaSP(db.Model):
     __tablename__ = 'la_casasp'
