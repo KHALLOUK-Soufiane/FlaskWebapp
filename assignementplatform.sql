@@ -1,34 +1,26 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.2
+-- version 4.9.7
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Jul 26, 2021 at 10:44 AM
--- Server version: 5.7.31
--- PHP Version: 7.3.21
+-- Hôte : localhost:3306
+-- Généré le : mar. 27 juil. 2021 à 22:58
+-- Version du serveur :  5.7.32
+-- Version de PHP : 7.4.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
 --
--- Database: `assignementplatform`
+-- Base de données : `assignementplatform`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `la_casa`
+-- Structure de la table `la_casa`
 --
 
-DROP TABLE IF EXISTS `la_casa`;
-CREATE TABLE IF NOT EXISTS `la_casa` (
+CREATE TABLE `la_casa` (
   `cne` text,
   `nomPrenom` text,
   `choix1` bigint(20) DEFAULT NULL,
@@ -44,11 +36,10 @@ CREATE TABLE IF NOT EXISTS `la_casa` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `la_casasp`
+-- Structure de la table `la_casasp`
 --
 
-DROP TABLE IF EXISTS `la_casasp`;
-CREATE TABLE IF NOT EXISTS `la_casasp` (
+CREATE TABLE `la_casasp` (
   `cne` text,
   `nomPrenom` text,
   `choix1` bigint(20) DEFAULT NULL,
@@ -64,11 +55,10 @@ CREATE TABLE IF NOT EXISTS `la_casasp` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `la_meknes`
+-- Structure de la table `la_meknes`
 --
 
-DROP TABLE IF EXISTS `la_meknes`;
-CREATE TABLE IF NOT EXISTS `la_meknes` (
+CREATE TABLE `la_meknes` (
   `cne` text,
   `nomPrenom` text,
   `choix1` bigint(20) DEFAULT NULL,
@@ -84,11 +74,10 @@ CREATE TABLE IF NOT EXISTS `la_meknes` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `la_meknessp`
+-- Structure de la table `la_meknessp`
 --
 
-DROP TABLE IF EXISTS `la_meknessp`;
-CREATE TABLE IF NOT EXISTS `la_meknessp` (
+CREATE TABLE `la_meknessp` (
   `cne` text,
   `nomPrenom` text,
   `choix1` bigint(20) DEFAULT NULL,
@@ -104,11 +93,10 @@ CREATE TABLE IF NOT EXISTS `la_meknessp` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `la_rabat`
+-- Structure de la table `la_rabat`
 --
 
-DROP TABLE IF EXISTS `la_rabat`;
-CREATE TABLE IF NOT EXISTS `la_rabat` (
+CREATE TABLE `la_rabat` (
   `cne` text,
   `nomPrenom` text,
   `choix1` bigint(20) DEFAULT NULL,
@@ -124,11 +112,10 @@ CREATE TABLE IF NOT EXISTS `la_rabat` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `la_rabatsp`
+-- Structure de la table `la_rabatsp`
 --
 
-DROP TABLE IF EXISTS `la_rabatsp`;
-CREATE TABLE IF NOT EXISTS `la_rabatsp` (
+CREATE TABLE `la_rabatsp` (
   `cne` text,
   `nomPrenom` text,
   `choix1` bigint(20) DEFAULT NULL,
@@ -144,121 +131,106 @@ CREATE TABLE IF NOT EXISTS `la_rabatsp` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `lp_casa`
+-- Structure de la table `lp_casa`
 --
 
-DROP TABLE IF EXISTS `lp_casa`;
-CREATE TABLE IF NOT EXISTS `lp_casa` (
+CREATE TABLE `lp_casa` (
   `cne` text,
   `nomPrenom` text,
   `choix1` bigint(20) DEFAULT NULL,
   `choix2` bigint(20) DEFAULT NULL,
   `choix3` bigint(20) DEFAULT NULL,
   `filiere` text,
-  `noteMaths` text,
-  `notePhysique` text,
   `moyenne` double DEFAULT NULL,
-  `branche` text,
+  `cdFiliere` text,
   `confirmed` tinyint(1) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `lp_meknes`
+-- Structure de la table `lp_meknes`
 --
 
-DROP TABLE IF EXISTS `lp_meknes`;
-CREATE TABLE IF NOT EXISTS `lp_meknes` (
+CREATE TABLE `lp_meknes` (
   `cne` text,
   `nomPrenom` text,
   `choix1` bigint(20) DEFAULT NULL,
   `choix2` bigint(20) DEFAULT NULL,
   `choix3` bigint(20) DEFAULT NULL,
   `filiere` text,
-  `noteMaths` text,
-  `notePhysique` text,
   `moyenne` double DEFAULT NULL,
-  `branche` text,
+  `cdFiliere` text,
   `confirmed` tinyint(1) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `lp_rabat`
+-- Structure de la table `lp_rabat`
 --
 
-DROP TABLE IF EXISTS `lp_rabat`;
-CREATE TABLE IF NOT EXISTS `lp_rabat` (
+CREATE TABLE `lp_rabat` (
   `cne` text,
   `nomPrenom` text,
   `choix1` bigint(20) DEFAULT NULL,
   `choix2` bigint(20) DEFAULT NULL,
   `choix3` bigint(20) DEFAULT NULL,
   `filiere` text,
-  `noteMaths` text,
-  `notePhysique` text,
   `moyenne` double DEFAULT NULL,
-  `branche` text,
+  `cdFiliere` text,
   `confirmed` tinyint(1) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `results`
+-- Structure de la table `results`
 --
 
-DROP TABLE IF EXISTS `results`;
-CREATE TABLE IF NOT EXISTS `results` (
+CREATE TABLE `results` (
   `cne` text,
-  `nomPrenom` text,
   `choix1` bigint(20) DEFAULT NULL,
   `choix2` bigint(20) DEFAULT NULL,
   `choix3` bigint(20) DEFAULT NULL,
   `filiere` text,
-  `noteMaths` double DEFAULT NULL,
-  `notePhysique` double DEFAULT NULL,
+  `cdFiliere` text,
   `moyenne` double DEFAULT NULL,
-  `branche` text
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `nomPrenom` text,
+  `status` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `results_sp`
+-- Structure de la table `results_sp`
 --
 
-DROP TABLE IF EXISTS `results_sp`;
-CREATE TABLE IF NOT EXISTS `results_sp` (
+CREATE TABLE `results_sp` (
   `cne` text,
-  `nomPrenom` text,
   `choix1` bigint(20) DEFAULT NULL,
   `choix2` bigint(20) DEFAULT NULL,
   `choix3` bigint(20) DEFAULT NULL,
   `filiere` text,
-  `noteMaths` double DEFAULT NULL,
-  `notePhysique` double DEFAULT NULL,
+  `cdFiliere` text,
   `moyenne` double DEFAULT NULL,
-  `branche` text
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `nomPrenom` text,
+  `status` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Structure de la table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE `users` (
   `username` varchar(20) NOT NULL,
-  `password` varchar(102) NOT NULL,
-  PRIMARY KEY (`username`)
+  `password` varchar(102) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `users`
+-- Déchargement des données de la table `users`
 --
 
 INSERT INTO `users` (`username`, `password`) VALUES
@@ -266,8 +238,13 @@ INSERT INTO `users` (`username`, `password`) VALUES
 ('ENSAM_Rabat', 'pbkdf2:sha256:260000$sIT0VcCtNHNLQLKV$6a6cad974c7a195abc00015feccb26e7d39c35972422f366fbc0b3ef74151bac'),
 ('ENSAM_Meknes', 'pbkdf2:sha256:260000$RsZ7Infypm2zw4VV$cdc72e7a59ffe0161f9b047c811d5d55137b332235dd2bb147171cf28675a2c5'),
 ('ENSAM_Casa', 'pbkdf2:sha256:260000$yvEUXyjA9jAF5ZNz$df4da411752e56a90acdaca03dd81a0dc657b52e5f4b282fca31b055a3e2a0b6');
-COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+--
+-- Index pour les tables déchargées
+--
+
+--
+-- Index pour la table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`username`);
