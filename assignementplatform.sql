@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : mar. 27 juil. 2021 à 22:58
+-- Généré le : mer. 28 juil. 2021 à 13:10
 -- Version du serveur :  5.7.32
 -- Version de PHP : 7.4.12
 
@@ -27,11 +27,10 @@ CREATE TABLE `la_casa` (
   `choix2` bigint(20) DEFAULT NULL,
   `choix3` bigint(20) DEFAULT NULL,
   `filiere` text,
-  `noteMaths` text,
-  `notePhysique` text,
   `moyenne` double DEFAULT NULL,
-  `status` bigint(20) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `cdFiliere` text,
+  `confirmed` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -65,11 +64,10 @@ CREATE TABLE `la_meknes` (
   `choix2` bigint(20) DEFAULT NULL,
   `choix3` bigint(20) DEFAULT NULL,
   `filiere` text,
-  `noteMaths` text,
-  `notePhysique` text,
   `moyenne` double DEFAULT NULL,
-  `status` bigint(20) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `cdFiliere` text,
+  `confirmed` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -103,11 +101,10 @@ CREATE TABLE `la_rabat` (
   `choix2` bigint(20) DEFAULT NULL,
   `choix3` bigint(20) DEFAULT NULL,
   `filiere` text,
-  `noteMaths` text,
-  `notePhysique` text,
   `moyenne` double DEFAULT NULL,
-  `status` bigint(20) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `cdFiliere` text,
+  `confirmed` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 

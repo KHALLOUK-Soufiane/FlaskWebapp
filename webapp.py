@@ -747,7 +747,6 @@ def downloadFiles():
         if app.config['AVAILABLE_PLACES_SM']!='NULL' and app.config['AVAILABLE_PLACES_SP']!='NULL':
             listesPrincipales = {'casa':pd.read_sql('SELECT * FROM lp_casa', con=db.engine), 'meknes':pd.read_sql('SELECT * FROM lp_meknes', con=db.engine), 'rabat':pd.read_sql('SELECT * FROM lp_rabat', con=db.engine)}
             listesAttentes = {'casa':pd.read_sql('SELECT * FROM la_casa', con=db.engine), 'meknes':pd.read_sql('SELECT * FROM la_meknes', con=db.engine), 'rabat':pd.read_sql('SELECT * FROM la_rabat', con=db.engine)}
-            listesAttentesSP = {'casa':pd.read_sql('SELECT * FROM la_casasp', con=db.engine), 'meknes':pd.read_sql('SELECT * FROM la_meknessp', con=db.engine), 'rabat':pd.read_sql('SELECT * FROM la_rabatsp', con=db.engine)}        
             results = pd.read_sql('SELECT * FROM results', con=db.engine)
             resultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
             
