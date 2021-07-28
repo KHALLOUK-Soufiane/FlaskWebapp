@@ -198,16 +198,158 @@ def confirmStudents():
             
         elif request.form['submit'] == 'meknes':
             lp = pd.read_sql('SELECT * FROM lp_meknes', con=db.engine)
+            ResultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
+            Results = pd.read_sql('SELECT * FROM results', con=db.engine)
+
+
             confirmed = request.form.getlist('confirmedMeknes')
             lp['confirmed'] = False
             lp.loc[lp.cne.isin(confirmed), 'confirmed'] = True
             lp.to_sql('lp_meknes', con=db.engine, index=False, if_exists='replace')
+
+            holder=lp[lp['confirmed'] == True]
+            for index, row in holder.iterrows():
+                if row['choix1'] != ENSAM_CODES['meknes']:
+                    holder = holder.drop(index)
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+
+            holder=lp[lp['confirmed'] == False]
+
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+            Results.to_sql('results', con=db.engine, index=False, if_exists='replace')
+            ResultsSP.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
         elif request.form['submit'] == 'rabat':
             lp = pd.read_sql('SELECT * FROM lp_rabat', con=db.engine)
+            ResultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
+            Results = pd.read_sql('SELECT * FROM results', con=db.engine)
+
+
             confirmed = request.form.getlist('confirmedRabat')
             lp['confirmed'] = False
             lp.loc[lp.cne.isin(confirmed), 'confirmed'] = True
             lp.to_sql('lp_rabat', con=db.engine, index=False, if_exists='replace')
+
+            holder=lp[lp['confirmed'] == True]
+            for index, row in holder.iterrows():
+                if row['choix1'] != ENSAM_CODES['rabat']:
+                    holder = holder.drop(index)
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+
+            holder=lp[lp['confirmed'] == False]
+
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+            Results.to_sql('results', con=db.engine, index=False, if_exists='replace')
+            ResultsSP.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
+    
+    return redirect('/')
+
+@app.route('/confirmStudentsLA', methods=['POST'])
+def confirmStudentsLA():
+    if current_user.is_authenticated:
+        if request.form['submit'] == 'casa':
+            lp = pd.read_sql('SELECT * FROM la_casa', con=db.engine)
+            ResultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
+            Results = pd.read_sql('SELECT * FROM results', con=db.engine)
+
+            confirmed = request.form.getlist('confirmedCasa')
+            lp['confirmed'] = False
+            lp.loc[lp.cne.isin(confirmed), 'confirmed'] = True
+            lp.to_sql('la_casa', con=db.engine, index=False, if_exists='replace')
+            ###
+            ##
+            #
+            #do the reallocation
+            #remove all confirmed members that were accepted in the LP
+            holder=lp[lp['confirmed'] == True]
+            for index, row in holder.iterrows():
+                if row['choix1'] != ENSAM_CODES['casa']:
+                    holder = holder.drop(index)
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+
+            holder=lp[lp['confirmed'] == False]
+
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+            Results.to_sql('results', con=db.engine, index=False, if_exists='replace')
+            ResultsSP.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
+
+            
+
+
+            
+        elif request.form['submit'] == 'meknes':
+            lp = pd.read_sql('SELECT * FROM la_meknes', con=db.engine)
+            ResultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
+            Results = pd.read_sql('SELECT * FROM results', con=db.engine)
+
+
+            confirmed = request.form.getlist('confirmedMeknes')
+            lp['confirmed'] = False
+            lp.loc[lp.cne.isin(confirmed), 'confirmed'] = True
+            lp.to_sql('la_meknes', con=db.engine, index=False, if_exists='replace')
+
+            holder=lp[lp['confirmed'] == True]
+            for index, row in holder.iterrows():
+                if row['choix1'] != ENSAM_CODES['meknes']:
+                    holder = holder.drop(index)
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+
+            holder=lp[lp['confirmed'] == False]
+
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+            Results.to_sql('results', con=db.engine, index=False, if_exists='replace')
+            ResultsSP.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
+        elif request.form['submit'] == 'rabat':
+            lp = pd.read_sql('SELECT * FROM la_rabat', con=db.engine)
+            ResultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
+            Results = pd.read_sql('SELECT * FROM results', con=db.engine)
+
+
+            confirmed = request.form.getlist('confirmedRabat')
+            lp['confirmed'] = False
+            lp.loc[lp.cne.isin(confirmed), 'confirmed'] = True
+            lp.to_sql('la_rabat', con=db.engine, index=False, if_exists='replace')
+
+            holder=lp[lp['confirmed'] == True]
+            for index, row in holder.iterrows():
+                if row['choix1'] != ENSAM_CODES['rabat']:
+                    holder = holder.drop(index)
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+
+            holder=lp[lp['confirmed'] == False]
+
+
+            Results.loc[Results.cne.isin(holder.cne),'status'] = 11
+            ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
+
+            Results.to_sql('results', con=db.engine, index=False, if_exists='replace')
+            ResultsSP.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
     
     return redirect('/')
 
@@ -417,7 +559,6 @@ def genererLA():
             
             resultsSP.sort_values(by=['moyenne'], inplace=True, ascending=False)
             resultsSP.dropna(subset=['cne', 'nomPrenom', 'moyenne', 'choix1', 'choix2', 'choix3'], inplace=True)
-            nbEtudiants = len(resultsSM.index)+len(resultsSP.index)
             
             for index, row in resultsSM.iterrows():
                 if AVAILABLE_PLACES_SM[choiceCodes[row['choix1']]] > 0:
@@ -458,7 +599,9 @@ def genererLA():
                 
             print('PPPPP')
             return redirect('/')
-        elif request.form.get('genererLP') == 'NP':
+        elif request.form.get('genererLA') == 'NP':
+            print("mok")
+
             colNames = ['cne', 'nomPrenom', 'choix1', 'choix2', 'choix3', 'filiere', 'noteMaths', 'notePhysique', 'moyenne']
             AVAILABLE_PLACES = {'casa':ceil(int(request.form.get('CASA_MAX_PLACES2'))), 'meknes':ceil(int(request.form.get('MEKNES_MAX_PLACES2'))), 'rabat':ceil(int(request.form.get('RABAT_MAX_PLACES2')))}           
             listesPrincipales = {'casa':[], 'meknes':[], 'rabat':[]}
@@ -468,6 +611,7 @@ def genererLA():
             resultsSM = pd.read_sql('SELECT * FROM results WHERE results.status=0', con=db.engine)
             resultsSP = pd.read_sql('SELECT * FROM results_sp WHERE results_sp.status=0', con=db.engine)
             
+            print("mok")
             resultsDf = pd.concat([resultsSM, resultsSP], ignore_index=True)
             
             resultsDf.sort_values(by=['moyenne'], inplace=True, ascending=False)
@@ -494,7 +638,7 @@ def genererLA():
                 listesPrincipales[key]=pd.DataFrame(listesPrincipales[key])
                 listesPrincipales[key]['confirmed'] = False
                 listesPrincipales[key].to_sql('la_'+key, con=db.engine, index=False, if_exists='replace')
-            
+            print('mok')
             return redirect('/')          
 
 @app.route('/genererLP', methods=['POST'])

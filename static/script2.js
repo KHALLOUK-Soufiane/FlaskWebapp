@@ -64,3 +64,20 @@ if (document.querySelector('#ParMerite')) {
         pdp.classList.remove('nodisp');
     });
 }
+
+PourcentageLA = document.querySelector('#genererLAForm')
+pdpLA = document.querySelector('#genererLAForm2')
+
+if(document.querySelector('#PourcentageLA')){
+    document.querySelector('#PourcentageLA').addEventListener('click', () => {
+        PourcentageLA.classList.remove('nodisp');
+        pdpLA.classList.add('nodisp');
+    });
+}
+
+if (document.querySelector('#ParMeriteLA')) {
+    document.querySelector('#ParMeriteLA').addEventListener('click', () => {
+        PourcentageLA.classList.add('nodisp');
+        pdpLA.classList.remove('nodisp');
+    });
+}

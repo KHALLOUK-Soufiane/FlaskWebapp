@@ -94,3 +94,14 @@ function updateTextInputRabat(val) {
     document.getElementById('pourcentageRabat').innerText=Math.floor(val); 
 }
 
+function updateTextInputCasa1(val) {
+    document.getElementById('pourcentageCasa1').innerText=Math.floor(val); 
+}
+
+function updateTextInputMeknes1(val) {
+    document.getElementById('pourcentageMeknes1').innerText=Math.floor(val); 
+}
+
+function updateTextInputRabat1(val) {
+    document.getElementById('pourcentageRabat1').innerText=Math.floor(val); 
+}
