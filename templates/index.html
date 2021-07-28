@@ -187,19 +187,23 @@
                             <th colspan="100%">Liste Principale Casablanca</th>
                         </tr>
                         <tr>
+                            <th>rang</th>
                             <th>CNE</th>
                             <th>Nom et Prenom</th>
                             <th>Moyenne</th>
                             <th>Confirmé</th>
                         </tr>
+                        {% set index = namespace(value=1)%}
+                        {% for row in lp_casa%}
 
-                        {% for row in lp_casa %}
                         <tr>
+                            <td>{{ index.value }}</td>
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom }}</td>
                             <td>{{ row.moyenne }}</td>
                             <td><input form='confirmationFormCasa' type="checkbox" name="confirmedCasa" value={{ row.cne }} {{'checked' if row.confirmed == True else ''}}></td>
                         </tr>
+                        {% set index.value = index.value + 1 %}
                         {% endfor %}
                     </table>
                     <label for="SubmitCasaBtn" class="btn">Confirmer</label>
@@ -215,19 +219,22 @@
                             <th colspan="100%">Liste Principale Meknes</th>
                         </tr>
                         <tr>
+                            <th>rang</th>
                             <th>CNE</th>
                             <th>Nom et Prenom</th>
                             <th>Moyenne</th>
                             <th>Confirmé</th>
                         </tr>
-
+                        {% set index = namespace(value=1)%}
                         {% for row in lp_meknes %}
                         <tr>
+                            <td>{{ index.value }}</td>
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom}}</td>
                             <td>{{ row.moyenne}}</td>
                             <td><input form='confirmationFormMeknes' type="checkbox" name="confirmedMeknes" value={{ row.cne }} {{'checked' if row.confirmed == True else ''}}></td>
                         </tr>
+                        {% set index.value = index.value + 1 %}
                         {% endfor %}
                     </table>
                     <label for="SubmitMeknesBtn" class="btn">Confirmer</label>
@@ -243,19 +250,22 @@
                             <th colspan="100%">Liste Principale Rabat</th>
                         </tr>
                         <tr>
+                            <th>rang</th>
                             <th>CNE</th>
                             <th>Nom et Prenom</th>
                             <th>Moyenne</th>
                             <th>Confirmé</th>
                         </tr>
-
+                        {% set index = namespace(value=1)%}
                         {% for row in lp_rabat %}
                         <tr>
+                            <td>{{ index.value }}</td>
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom}}</td>
                             <td>{{ row.moyenne}}</td>
                             <td><input form='confirmationFormRabat' type="checkbox" name="confirmedRabat" value={{ row.cne }} id="" {{'checked' if row.confirmed == True else ''}}></td>
                         </tr>
+                        {% set index.value = index.value + 1 %}
                         {% endfor %}
                     </table>
                     <label for="SubmitRabatBtn" class="btn">Confirmer</label>
@@ -371,19 +381,23 @@
                             <th colspan="100%">Liste Principale Casablanca</th>
                         </tr>
                         <tr>
+                            <th>rang</th>
                             <th>CNE</th>
                             <th>Nom et Prenom</th>
                             <th>Moyenne</th>
                             <th>Confirmé</th>
                         </tr>
-
+                        {% set index = namespace(value=1)%}
                         {% for row in la_casa %}
                         <tr>
+                            <td>{{ index.value }}</td>
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom }}</td>
                             <td>{{ row.moyenne }}</td>
+                            
                             <td><input form='confirmationFormCasaLA' type="checkbox" name="confirmedCasa" value={{ row.cne }} {{'checked' if row.confirmed == True else ''}}></td>
                         </tr>
+                        {% set index.value = index.value + 1 %}
                         {% endfor %}
                     </table>
                     <label for="SubmitCasaBtnLA" class="btn">Confirmer</label>
@@ -399,19 +413,22 @@
                             <th colspan="100%">Liste Principale Meknes</th>
                         </tr>
                         <tr>
+                            <th>rang</th>
                             <th>CNE</th>
                             <th>Nom et Prenom</th>
                             <th>Moyenne</th>
                             <th>Confirmé</th>
                         </tr>
-
+                        {% set index = namespace(value=1)%}
                         {% for row in la_meknes %}
                         <tr>
+                            <td>{{ index.value }}</td>
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom}}</td>
                             <td>{{ row.moyenne}}</td>
                             <td><input form='confirmationFormMeknesLA' type="checkbox" name="confirmedMeknes" value={{ row.cne }} {{'checked' if row.confirmed == True else ''}}></td>
                         </tr>
+                        {% set index.value = index.value + 1 %}
                         {% endfor %}
                     </table>
                     <label for="SubmitMeknesBtnLA" class="btn">Confirmer</label>
@@ -427,19 +444,22 @@
                             <th colspan="100%">Liste Principale Rabat</th>
                         </tr>
                         <tr>
+                            <th>rang</th>
                             <th>CNE</th>
                             <th>Nom et Prenom</th>
                             <th>Moyenne</th>
                             <th>Confirmé</th>
                         </tr>
-
+                        {% set index = namespace(value=1)%}
                         {% for row in la_rabat %}
                         <tr>
+                            <td>{{ index.value }}</td>
                             <td>{{ row.cne }}</td>
                             <td>{{ row.nomPrenom}}</td>
                             <td>{{ row.moyenne}}</td>
                             <td><input form='confirmationFormRabatLA' type="checkbox" name="confirmedRabat" value={{ row.cne }} id="" {{'checked' if row.confirmed == True else ''}}></td>
                         </tr>
+                        {% set index.value = index.value + 1 %}
                         {% endfor %}
                     </table>
                     <label for="SubmitRabatBtnLA" class="btn">Confirmer</label>

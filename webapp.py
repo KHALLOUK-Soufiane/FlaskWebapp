@@ -62,7 +62,7 @@ def toPdf(name, typ, listesPrincipales, listesAttentes, AVAILABLE_PLACES_SM, AVA
         header = open('assets/'+name+'AttenteHeader.html', 'r')
         html=''
         for line in header:
-            html += line.replace('date', str(date.today().year-1)+'-'+str(date.today().year)).replace('$b64Img$', b64Image).replace('AVAILABLE_PLACES', str(AVAILABLE_PLACES_SM[name]))
+            html += line.replace('date', str(date.today().year-1)+'-'+str(date.today().year)).replace('$b64Img$', b64Image)
         html += listesAttentes[name][['cne','nomPrenom']].to_html(index=False, table_id=name+'Table').replace('border="1"', '')
         html+='</body>'
         header.close()
@@ -70,7 +70,7 @@ def toPdf(name, typ, listesPrincipales, listesAttentes, AVAILABLE_PLACES_SM, AVA
         header = open('assets/'+name+'AttenteHeaderSP.html', 'r')
         html=''
         for line in header:
-            html += line.replace('date', str(date.today().year-1)+'-'+str(date.today().year)).replace('$b64Img$', b64Image).replace('AVAILABLE_PLACES', str(AVAILABLE_PLACES_SP[name]))
+            html += line.replace('date', str(date.today().year-1)+'-'+str(date.today().year)).replace('$b64Img$', b64Image)
         html += listesAttentes[name][['cne','nomPrenom']].to_html(index=False, table_id=name+'Table').replace('border="1"', '')
         html+='</body>'
         header.close()
@@ -744,131 +744,115 @@ def genererLP():
 @app.route('/downloadFiles')
 def downloadFiles():
     if current_user.is_authenticated:
-        if app.config['AVAILABLE_PLACES_SM']!='NULL' and app.config['AVAILABLE_PLACES_SP']!='NULL':
-            listesPrincipales = {'casa':pd.read_sql('SELECT * FROM lp_casa', con=db.engine), 'meknes':pd.read_sql('SELECT * FROM lp_meknes', con=db.engine), 'rabat':pd.read_sql('SELECT * FROM lp_rabat', con=db.engine)}
-            listesAttentes = {'casa':pd.read_sql('SELECT * FROM la_casa', con=db.engine), 'meknes':pd.read_sql('SELECT * FROM la_meknes', con=db.engine), 'rabat':pd.read_sql('SELECT * FROM la_rabat', con=db.engine)}
-            results = pd.read_sql('SELECT * FROM results', con=db.engine)
-            resultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
-            
-            nbEtudiants = len(results.index)
-            nbEtudiantsSP = len(resultsSP.index)
-            
-            wb = openpyxl.load_workbook('output/Resultats.xlsx')
-            ws = wb['resultatsSM']
-            ws.delete_rows(0,4*nbEtudiants)
-            for row in dataframe_to_rows(results.loc[:,~(results.columns.str.match("Unnamed")) & ~(results.columns.str.match("branche"))], index=False):
-                ws.append(row)
-            maxCol = ws.max_column
-            ws.cell(1, maxCol+1).value = 'Affectation Liste Principale'
-            ws.cell(1, maxCol+2).value = 'Affectation Liste d\'Attente'
-            
-            for i in range(2,nbEtudiants+2):
-                flag=1
-                for key in listesPrincipales:
-                    if ws['A'+str(i)].value in listesPrincipales[key].cne.values:
-                        ws.cell(i, maxCol+1).value = key.capitalize()
-                        flag=0
-                if flag:
-                    ws.cell(i, maxCol+1).value = ''
-            for i in range(2,nbEtudiants+2):
-                flag=1
-                for key in listesAttentes:
-                    if ws['A'+str(i)].value in listesAttentes[key].cne.values:
-                        ws.cell(i, maxCol+2).value = key.capitalize()
-                        flag = 0
-                if flag:
-                    ws.cell(i, maxCol+2).value = ''
+        listesPrincipales = {'casa':pd.read_sql('SELECT * FROM lp_casa', con=db.engine), 'meknes':pd.read_sql('SELECT * FROM lp_meknes', con=db.engine), 'rabat':pd.read_sql('SELECT * FROM lp_rabat', con=db.engine)}
+        listesAttentes = {'casa':pd.read_sql('SELECT * FROM la_casa', con=db.engine), 'meknes':pd.read_sql('SELECT * FROM la_meknes', con=db.engine), 'rabat':pd.read_sql('SELECT * FROM la_rabat', con=db.engine)}
+        results = pd.read_sql('SELECT * FROM results', con=db.engine)
+        resultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
+        
+        nbEtudiants = len(results.index)
+        nbEtudiantsSP = len(resultsSP.index)
+        
+        wb = openpyxl.load_workbook('output/Resultats.xlsx')
+        ws = wb['resultatsSM']
+        ws.delete_rows(0,4*nbEtudiants)
+        for row in dataframe_to_rows(results.loc[:,~(results.columns.str.match("Unnamed")) & ~(results.columns.str.match("status"))], index=False):
+            ws.append(row)
+        maxCol = ws.max_column
+        ws.cell(1, maxCol+1).value = 'Affectation Liste Principale'
+        ws.cell(1, maxCol+2).value = 'Affectation Liste d\'Attente'
+        
+        for i in range(2,nbEtudiants+2):
+            flag=1
+            for key in listesPrincipales:
+                if ws['A'+str(i)].value in listesPrincipales[key].cne.values:
+                    ws.cell(i, maxCol+1).value = key.capitalize()
+                    flag=0
+            if flag:
+                ws.cell(i, maxCol+1).value = ''
+        for i in range(2,nbEtudiants+2):
+            flag=1
+            for key in listesAttentes:
+                if ws['A'+str(i)].value in listesAttentes[key].cne.values:
+                    ws.cell(i, maxCol+2).value = key.capitalize()
+                    flag = 0
+            if flag:
+                ws.cell(i, maxCol+2).value = ''
 
 
-            ws = wb['resultatsSP']
-            ws.delete_rows(0,4*nbEtudiantsSP)
-            for row in dataframe_to_rows(resultsSP.loc[:,~resultsSP.columns.str.match("Unnamed") & ~(results.columns.str.match("branche"))], index=False):
+        ws = wb['resultatsSP']
+        ws.delete_rows(0,4*nbEtudiantsSP)
+        for row in dataframe_to_rows(resultsSP.loc[:,~resultsSP.columns.str.match("Unnamed") & ~(results.columns.str.match("status"))], index=False):
+            ws.append(row)
+        maxColSP = ws.max_column
+        ws.cell(1, maxColSP+1).value = 'Affectation Liste Principale'
+        ws.cell(1, maxColSP+2).value = 'Affectation Liste d\'Attente'
+        for i in range(2,nbEtudiantsSP+2):
+            flag=1
+            for key in listesPrincipales:
+                if ws['A'+str(i)].value in listesPrincipales[key].cne.values:
+                    ws.cell(i, maxColSP+1).value = key.capitalize()
+                    flag=0
+            if flag:
+                ws.cell(i, maxColSP+1).value = ''
+        for i in range(2,nbEtudiantsSP+2):
+            flag=1
+            for key in listesAttentes:
+                if ws['A'+str(i)].value in listesAttentes[key].cne.values:
+                    ws.cell(i, maxColSP+2).value = key.capitalize()
+                    flag = 0
+            if flag:
+                ws.cell(i, maxColSP+2).value = ''
+    
+    
+        for key in listesPrincipales:               
+            name = 'LP_'+key
+            if name not in wb.sheetnames:
+                wb.create_sheet(name)
+                ws = wb[name]
+            else:
+                ws = wb[name]
+                ws.delete_rows(2,2*nbEtudiants)
+            
+            for row in dataframe_to_rows(listesPrincipales[key].drop('confirmed', axis=1), index=False):
                 ws.append(row)
-            maxColSP = ws.max_column
-            ws.cell(1, maxColSP+1).value = 'Affectation Liste Principale'
-            ws.cell(1, maxColSP+2).value = 'Affectation Liste d\'Attente'
-            for i in range(2,nbEtudiantsSP+2):
-                flag=1
-                for key in listesPrincipales:
-                    if ws['A'+str(i)].value in listesPrincipales[key].cne.values:
-                        ws.cell(i, maxColSP+1).value = key.capitalize()
-                        flag=0
-                if flag:
-                    ws.cell(i, maxColSP+1).value = ''
-            for i in range(2,nbEtudiantsSP+2):
-                flag=1
-                for key in listesAttentes:
-                    if ws['A'+str(i)].value in listesAttentesSP[key].cne.values:
-                        ws.cell(i, maxColSP+2).value = key.capitalize()
-                        flag = 0
-                if flag:
-                    ws.cell(i, maxColSP+2).value = ''
+                        
+            listesPrincipales[key].sort_values(by=['nomPrenom'], inplace=True)
+            toPdf(key, 'LP', listesPrincipales, listesAttentes, app.config['AVAILABLE_PLACES_SM'], app.config['AVAILABLE_PLACES_SP'])
+        for key in listesAttentes:               
+            name = 'LA_'+key
+            if name not in wb.sheetnames:
+                wb.create_sheet(name)
+                ws = wb[name]
+            else:
+                ws = wb[name]
+                ws.delete_rows(2,2*nbEtudiants)
+            
+            for row in dataframe_to_rows(listesAttentes[key], index=False):
+                ws.append(row)
+            
+            toPdf(key, 'LA', listesPrincipales, listesAttentes, app.config['AVAILABLE_PLACES_SM'], app.config['AVAILABLE_PLACES_SP'])        
         
+        ws = wb['resultatsSM']
+        for cell in ws["1:1"]:
+            cell.font = openpyxl.styles.Font(color='00000000', bold=True, size='12') 
+            cell.alignment = openpyxl.styles.alignment.Alignment(horizontal = 'center', vertical ='center')
         
-            for key in listesPrincipales:               
-                name = 'LP_'+key
-                if name not in wb.sheetnames:
-                    wb.create_sheet(name)
-                    ws = wb[name]
-                else:
-                    ws = wb[name]
-                    ws.delete_rows(2,2*nbEtudiants)
-                
-                for row in dataframe_to_rows(listesPrincipales[key].drop('confirmed', axis=1).drop('branche', axis=1), index=False):
-                    ws.append(row)
-                            
-                listesPrincipales[key].sort_values(by=['nomPrenom'], inplace=True)
-                toPdf(key, 'LP', listesPrincipales, listesAttentes, app.config['AVAILABLE_PLACES_SM'], app.config['AVAILABLE_PLACES_SP'])
-            for key in listesAttentes:               
-                name = 'LA_'+key
-                if name not in wb.sheetnames:
-                    wb.create_sheet(name)
-                    ws = wb[name]
-                else:
-                    ws = wb[name]
-                    ws.delete_rows(2,2*nbEtudiants)
-                
-                for row in dataframe_to_rows(listesAttentes[key], index=False):
-                    ws.append(row)
-                
-                toPdf(key, 'LA', listesPrincipales, listesAttentes, app.config['AVAILABLE_PLACES_SM'], app.config['AVAILABLE_PLACES_SP'])        
-                
-            for key in listesAttentesSP:               
-                name = 'LA_'+key+'_SE'
-                if name not in wb.sheetnames:
-                    wb.create_sheet(name)
-                    ws = wb[name]
-                else:
-                    ws = wb[name]
-                    ws.delete_rows(2,2*nbEtudiants)
-                
-                for row in dataframe_to_rows(listesAttentesSP[key], index=False):
-                    ws.append(row)
-                
-                toPdf(key, 'LASP', listesPrincipales, listesAttentesSP, app.config['AVAILABLE_PLACES_SM'], app.config['AVAILABLE_PLACES_SP']) 
-            
-            ws = wb['resultatsSM']
-            for cell in ws["1:1"]:
-                cell.font = openpyxl.styles.Font(color='00000000', bold=True, size='12') 
-                cell.alignment = openpyxl.styles.alignment.Alignment(horizontal = 'center', vertical ='center')
-            
-            for row in ws.iter_rows():
-                for cell in row:
-                    cell.border = openpyxl.styles.borders.Border(left=openpyxl.styles.borders.Side(style='thin'), right=openpyxl.styles.borders.Side(style='thin'), top=openpyxl.styles.borders.Side(style='thin'), bottom=openpyxl.styles.borders.Side(style='thin'))
-            
-            ws = wb['resultatsSP']
-            for cell in ws["1:1"]:
-                cell.font = openpyxl.styles.Font(color='00000000', bold=True, size='12') 
-                cell.alignment = openpyxl.styles.alignment.Alignment(horizontal = 'center', vertical ='center')
-            
-            for row in ws.iter_rows():
-                for cell in row:
-                    cell.border = openpyxl.styles.borders.Border(left=openpyxl.styles.borders.Side(style='thin'), right=openpyxl.styles.borders.Side(style='thin'), top=openpyxl.styles.borders.Side(style='thin'), bottom=openpyxl.styles.borders.Side(style='thin')) 
-            
-            wb.save('output/Resultats.xlsx')
-            return redirect('/zipnsend')
-        else:
-            return "les listes d'attente ne sont pas encore générées"
+        for row in ws.iter_rows():
+            for cell in row:
+                cell.border = openpyxl.styles.borders.Border(left=openpyxl.styles.borders.Side(style='thin'), right=openpyxl.styles.borders.Side(style='thin'), top=openpyxl.styles.borders.Side(style='thin'), bottom=openpyxl.styles.borders.Side(style='thin'))
+        
+        ws = wb['resultatsSP']
+        for cell in ws["1:1"]:
+            cell.font = openpyxl.styles.Font(color='00000000', bold=True, size='12') 
+            cell.alignment = openpyxl.styles.alignment.Alignment(horizontal = 'center', vertical ='center')
+        
+        for row in ws.iter_rows():
+            for cell in row:
+                cell.border = openpyxl.styles.borders.Border(left=openpyxl.styles.borders.Side(style='thin'), right=openpyxl.styles.borders.Side(style='thin'), top=openpyxl.styles.borders.Side(style='thin'), bottom=openpyxl.styles.borders.Side(style='thin')) 
+        
+        wb.save('output/Resultats.xlsx')
+        return redirect('/zipnsend')
+
 
 @app.route('/zipnsend')
 def zipnsend():
