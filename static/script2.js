@@ -87,11 +87,20 @@ confCasa = document.querySelector('#confCasa')
 confMeknes = document.querySelector('#confMeknes')
 confRabat = document.querySelector('#confRabat')
 
+
+document.querySelector('#ConfCasaButton').style.backgroundColor = '#B07156'
+document.querySelector('#ConfCasaButton').style.borderColor = '#B07156'
 if(document.querySelector('#ConfCasaButton')){
     document.querySelector('#ConfCasaButton').addEventListener('click', () => {
         confCasa.classList.remove('nodisp');
         confMeknes.classList.add('nodisp');
         confRabat.classList.add('nodisp');
+        document.querySelector('#ConfCasaButton').style.backgroundColor = '#B07156'
+        document.querySelector('#ConfMeknesButton').style.backgroundColor = '#06689F'
+        document.querySelector('#ConfRabatButton').style.backgroundColor = '#06689F'
+        document.querySelector('#ConfCasaButton').style.borderColor = '#B07156'
+        document.querySelector('#ConfMeknesButton').style.borderColor = '#06689F'
+        document.querySelector('#ConfRabatButton').style.borderColor = '#06689F'
     });
 }
 
@@ -100,6 +109,12 @@ if (document.querySelector('#ConfMeknesButton')) {
         confCasa.classList.add('nodisp');
         confMeknes.classList.remove('nodisp');
         confRabat.classList.add('nodisp');
+        document.querySelector('#ConfCasaButton').style.backgroundColor = '#06689F'
+        document.querySelector('#ConfMeknesButton').style.backgroundColor = '#A4A8D1'
+        document.querySelector('#ConfRabatButton').style.backgroundColor = '#06689F'
+        document.querySelector('#ConfCasaButton').style.borderColor = '#06689F'
+        document.querySelector('#ConfMeknesButton').style.borderColor = '#A4A8D1'
+        document.querySelector('#ConfRabatButton').style.borderColor = '#06689F'
     });
 }
 
@@ -108,5 +123,11 @@ if (document.querySelector('#ConfRabatButton')) {
         confCasa.classList.add('nodisp');
         confMeknes.classList.add('nodisp');
         confRabat.classList.remove('nodisp');
+        document.querySelector('#ConfCasaButton').style.backgroundColor = '#06689F'
+        document.querySelector('#ConfMeknesButton').style.backgroundColor = '#06689F'
+        document.querySelector('#ConfRabatButton').style.backgroundColor = '#1B998B'
+        document.querySelector('#ConfCasaButton').style.borderColor = '#06689F'
+        document.querySelector('#ConfMeknesButton').style.borderColor = '#06689F'
+        document.querySelector('#ConfRabatButton').style.borderColor = '#1B998B'
     });
 }

@@ -101,9 +101,6 @@ def index():
             la_casa = LACasa.query.order_by(LACasa.moyenne.desc()).all()
             la_meknes = LAMeknes.query.order_by(LAMeknes.moyenne.desc()).all()
             la_rabat = LARabat.query.order_by(LARabat.moyenne.desc()).all()
-            la_casasp = LACasaSP.query.order_by(LACasaSP.moyenne.desc()).all()
-            la_meknessp = LAMeknesSP.query.order_by(LAMeknesSP.moyenne.desc()).all()
-            la_rabatsp = LARabatSP.query.order_by(LARabatSP.moyenne.desc()).all()
             inscritsCasa = InscritsCasa.query.order_by(InscritsCasa.moyenne.desc()).all()
             inscritsMeknes = InscritsMeknes.query.order_by(InscritsMeknes.moyenne.desc()).all()
             inscritsRabat = InscritsRabat.query.order_by(InscritsRabat.moyenne.desc()).all()
@@ -123,11 +120,14 @@ def index():
             la_casa = 'NULL'
             la_meknes = 'NULL'
             la_rabat = 'NULL'
-        elif not(inscritsCasa and inscritsMeknes and inscritsRabat):
+        elif not inscritsCasa:
             inscritsCasa = 'NULL'
+        elif not inscritsMeknes :
             inscritsMeknes = 'NULL'
+        elif not inscritsRabat:
             inscritsRabat = 'NULL'
-        return render_template('index.html', inscritsCasa=inscritsCasa, inscritsMeknes = inscritsMeknes, inscritsRabat=inscritsRabat , results=results, resultsSP=resultsSP, lp_casa=lp_casa, lp_meknes=lp_meknes, lp_rabat=lp_rabat, la_casa=la_casa, la_meknes=la_meknes, la_rabat=la_rabat, la_casasp=la_casasp, la_meknessp=la_meknessp, la_rabatsp=la_rabatsp, AVAILABLE_PLACES_SM=app.config['AVAILABLE_PLACES_SM'], AVAILABLE_PLACES_SP=app.config['AVAILABLE_PLACES_SP'], current_user = current_user)
+            
+        return render_template('index.html', inscritsCasa=inscritsCasa, inscritsMeknes = inscritsMeknes, inscritsRabat=inscritsRabat , results=results, resultsSP=resultsSP, lp_casa=lp_casa, lp_meknes=lp_meknes, lp_rabat=lp_rabat, la_casa=la_casa, la_meknes=la_meknes, la_rabat=la_rabat, AVAILABLE_PLACES_SM=app.config['AVAILABLE_PLACES_SM'], AVAILABLE_PLACES_SP=app.config['AVAILABLE_PLACES_SP'], current_user = current_user)
     else:
         return redirect('/login')
 
@@ -154,6 +154,8 @@ def uploadResults():
                 resultsDf.dropna(subset=['cne', 'nom', 'prenom', 'moyenne', 'choix1', 'choix2', 'choix3', 'cdFiliere'], inplace=True)
                 resultsDf['nomPrenom'] = resultsDf['nom'] + ' ' + resultsDf['prenom']
                 resultsDf.drop(columns=['nom', 'prenom'], inplace=True)
+                re = resultsDf.pop('nomPrenom')
+                resultsDf.insert(1, 'nomPrenom', re)
                 
                 resultsDf['status'] = 0
                 resultsSM = resultsDf[resultsDf["cdFiliere"].isin(CODES_FILIERES_SM)]
@@ -164,6 +166,11 @@ def uploadResults():
                 resultsSP.sort_values(by=['moyenne'], inplace=True, ascending=False)
                 resultsSP.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
                 
+                db.session.query(InscritsCasa).delete()
+                db.session.query(InscritsMeknes).delete()
+                db.session.query(InscritsRabat).delete()
+                db.session.commit()
+                                
                 return redirect('/') 
 
 @app.route('/confirmStudents', methods=['POST'])
@@ -187,9 +194,7 @@ def confirmStudents():
             Results.loc[Results.cne.isin(holder.cne),'status'] = 11
             ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
 
-
             holder=lp[lp['confirmed'] == False]
-
 
             Results.loc[Results.cne.isin(holder.cne),'status'] = 11
             ResultsSP.loc[ResultsSP.cne.isin(holder.cne),'status'] = 11
@@ -429,116 +434,6 @@ def confirmStudentsLA():
               
     return redirect('/')
 
-@app.route('/statusStudents', methods=['POST'])
-def statusStudents():
-    if current_user.is_authenticated:
-        if request.form['submit'] == 'casaSM':
-            la = pd.read_sql('SELECT * FROM la_casa', con=db.engine)
-            conf = request.form.getlist('statusCasaSM')
-            confirmed=[]
-            absent=[]
-            for cne in conf:
-                if cne.split('.')[0]=='a':
-                    absent.append(cne.split('.')[1])
-                elif cne.split('.')[0]=='c':
-                    confirmed.append(cne.split('.')[1])
-                
-            app.config['AVAILABLE_PLACES_SM']['casa']-=len(confirmed)
-
-            la['status'] = 0
-            la.loc[la.cne.isin(confirmed), 'status'] = 1
-            la.loc[la.cne.isin(absent), 'status'] = -1
-            la.to_sql('la_casa', con=db.engine, index=False, if_exists='replace')
-
-
-        elif request.form['submit'] == 'meknesSM':
-            la = pd.read_sql('SELECT * FROM la_meknes', con=db.engine)
-            conf = request.form.getlist('statusMeknesSM')
-            confirmed=[]
-            absent=[]
-            for cne in conf:
-                if cne.split('.')[0]=='a':
-                    absent.append(cne.split('.')[1])
-                elif cne.split('.')[0]=='c':
-                    confirmed.append(cne.split('.')[1])
-            
-            app.config['AVAILABLE_PLACES_SM']['meknes']-=len(confirmed)
-            la['status'] = 0
-            la.loc[la.cne.isin(confirmed), 'status'] = 1
-            la.loc[la.cne.isin(absent), 'status'] = -1
-            la.to_sql('la_meknes', con=db.engine, index=False, if_exists='replace')
-
-        elif request.form['submit'] == 'rabatSM':
-            la = pd.read_sql('SELECT * FROM la_rabat', con=db.engine)
-            conf = request.form.getlist('statusRabatSM')
-            confirmed=[]
-            absent=[]
-            for cne in conf:
-                if cne.split('.')[0]=='a':
-                    absent.append(cne.split('.')[1])
-                elif cne.split('.')[0]=='c':
-                    confirmed.append(cne.split('.')[1])
-
-            app.config['AVAILABLE_PLACES_SM']['rabat']-=len(confirmed)
-            la['status'] = 0
-            la.loc[la.cne.isin(confirmed), 'status'] = 1
-            la.loc[la.cne.isin(absent), 'status'] = -1
-            la.to_sql('la_rabat', con=db.engine, index=False, if_exists='replace')
-
-        elif request.form['submit'] == 'casaSP':
-            la = pd.read_sql('SELECT * FROM la_casasp', con=db.engine)
-            conf = request.form.getlist('statusCasaSP')
-            confirmed=[]
-            absent=[]
-            for cne in conf:
-                if cne.split('.')[0]=='a':
-                    absent.append(cne.split('.')[1])
-                elif cne.split('.')[0]=='c':
-                    confirmed.append(cne.split('.')[1]) 
-
-            app.config['AVAILABLE_PLACES_SP']['casa']-=len(confirmed)
-            la['status'] = 0
-            la.loc[la.cne.isin(confirmed), 'status'] = 1
-            la.loc[la.cne.isin(absent), 'status'] = -1
-            la.to_sql('la_casasp', con=db.engine, index=False, if_exists='replace')
-
-
-        elif request.form['submit'] == 'meknesSP':
-            la = pd.read_sql('SELECT * FROM la_meknessp', con=db.engine)
-            conf = request.form.getlist('statusMeknesSP')
-            confirmed=[]
-            absent=[]
-            for cne in conf:
-                if cne.split('.')[0]=='a':
-                    absent.append(cne.split('.')[1])
-                elif cne.split('.')[0]=='c':
-                    confirmed.append(cne.split('.')[1])
-            
-            app.config['AVAILABLE_PLACES_SP']['meknes']-=len(confirmed)
-            la['status'] = 0
-            la.loc[la.cne.isin(confirmed), 'status'] = 1
-            la.loc[la.cne.isin(absent), 'status'] = -1
-            la.to_sql('la_meknessp', con=db.engine, index=False, if_exists='replace')
-            
-        elif request.form['submit'] == 'rabatSP':
-            la = pd.read_sql('SELECT * FROM la_rabatsp', con=db.engine)
-            conf = request.form.getlist('statusRabatSP')
-            confirmed=[]
-            absent=[]
-            for cne in conf:
-                if cne.split('.')[0]=='a':
-                    absent.append(cne.split('.')[1])
-                elif cne.split('.')[0]=='c':
-                    confirmed.append(cne.split('.')[1])
-
-            app.config['AVAILABLE_PLACES_SP']['rabat']-=len(confirmed)
-            la['status'] = 0
-            la.loc[la.cne.isin(confirmed), 'status'] = 1
-            la.loc[la.cne.isin(absent), 'status'] = -1
-            la.to_sql('la_rabatsp', con=db.engine, index=False, if_exists='replace')               
-    
-    return redirect('/')
-
 @app.route('/genererLA', methods=['GET', 'POST'])
 def genererLA():
 #     if current_user.is_authenticated:
@@ -673,10 +568,8 @@ def genererLA():
                 listesPrincipales[key]['confirmed'] = False
                 listesPrincipales[key].to_sql('la_'+key, con=db.engine, index=False, if_exists='replace')
                 
-            print('PPPPP')
             return redirect('/')
         elif request.form.get('genererLA') == 'NP':
-            print("mok")
 
             colNames = ['cne', 'nomPrenom', 'choix1', 'choix2', 'choix3', 'filiere', 'noteMaths', 'notePhysique', 'moyenne']
             AVAILABLE_PLACES = {'casa':ceil(int(request.form.get('CASA_MAX_PLACES2'))), 'meknes':ceil(int(request.form.get('MEKNES_MAX_PLACES2'))), 'rabat':ceil(int(request.form.get('RABAT_MAX_PLACES2')))}           
@@ -687,7 +580,6 @@ def genererLA():
             resultsSM = pd.read_sql('SELECT * FROM results WHERE results.status=0', con=db.engine)
             resultsSP = pd.read_sql('SELECT * FROM results_sp WHERE results_sp.status=0', con=db.engine)
             
-            print("mok")
             resultsDf = pd.concat([resultsSM, resultsSP], ignore_index=True)
             
             resultsDf.sort_values(by=['moyenne'], inplace=True, ascending=False)
@@ -714,7 +606,6 @@ def genererLA():
                 listesPrincipales[key]=pd.DataFrame(listesPrincipales[key])
                 listesPrincipales[key]['confirmed'] = False
                 listesPrincipales[key].to_sql('la_'+key, con=db.engine, index=False, if_exists='replace')
-            print('mok')
             return redirect('/')          
 
 @app.route('/genererLP', methods=['POST'])
@@ -776,7 +667,6 @@ def genererLP():
                 listesPrincipales[key]['confirmed'] = False
                 listesPrincipales[key].to_sql('lp_'+key, con=db.engine, index=False, if_exists='replace')
                 
-            print('PPPPP')
             return redirect('/')
         elif request.form.get('genererLP') == 'NP':
             colNames = ['cne', 'nomPrenom', 'choix1', 'choix2', 'choix3', 'filiere', 'noteMaths', 'notePhysique', 'moyenne']

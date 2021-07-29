@@ -473,7 +473,6 @@
 
     <div id="conf" class="nodisp main">
         <div class="tables">
-            {% if inscritsCasa != 'NULL' and inscritsMeknes != 'NULL' and inscritsRabat !='NULL'%}
             <nav>
                 {% if current_user.username == 'ENSAM_Casa' or current_user.username == 'admin' %} 
                     <button class='btn' id="ConfCasaButton">Etudiants Confirmés Casablanca</button>
@@ -494,11 +493,12 @@
                 {% endif %}
     
             </nav>
-    
+            
+            {% if inscritsCasa != 'NULL'%}
             <div id='confCasa'>
             {% if current_user.username == 'ENSAM_Casa' or current_user.username == 'admin' %} 
                     <table class="table">
-                        <tr>
+                        <tr class="headCasa">
                             <th colspan="100%">Liste Confirmés Casablanca</th>
                         </tr>
                         <tr>
@@ -523,11 +523,13 @@
                     </table>
             {% endif %}
             </div>
+            {% endif %}
             
+            {% if inscritsMeknes != 'NULL' %}
             <div id="confMeknes" class="nodisp">
                 {% if current_user.username == 'ENSAM_Meknes' or current_user.username == 'admin' %} 
                 <table class="table">
-                    <tr>
+                    <tr class="headMeknes">
                         <th colspan="100%">Liste Confirmés Meknes</th>
                     </tr>
                     <tr>
@@ -550,13 +552,15 @@
                     </tr>
                     {% endfor %}
                 </table>
-        {% endif %}
+                {% endif %}
             </div>
+            {% endif %}
     
+            {% if inscritsRabat != 'NULL' %}
             <div id="confRabat" class="nodisp">
                 {% if current_user.username == 'ENSAM_Rabat' or current_user.username == 'admin' %} 
                     <table class="table">
-                        <tr>
+                        <tr class="headRabat">
                             <th colspan="100%">Liste Confirmés Rabat</th>
                         </tr>
                         <tr>
