@@ -1,23 +1,34 @@
 ListePrincipale = document.querySelector('#LP');
 ListeAttente = document.querySelector('#LA');
 Results = document.querySelector('#RES');
+conf = document.querySelector('#conf')
 
 document.querySelector('#LPButton').addEventListener('click', () => {
     ListePrincipale.classList.remove('nodisp');
     ListeAttente.classList.add('nodisp');
     Results.classList.add('nodisp');
+    conf.classList.add('nodisp');
 });
 
 document.querySelector('#LAButton').addEventListener('click', () => {
     ListeAttente.classList.remove('nodisp');
     ListePrincipale.classList.add('nodisp');
     Results.classList.add('nodisp');
+    conf.classList.add('nodisp');
 });
 
 document.querySelector('#Results').addEventListener('click', () => {
     ListePrincipale.classList.add('nodisp');
     ListeAttente.classList.add('nodisp');
     Results.classList.remove('nodisp');
+    conf.classList.add('nodisp');
+});
+
+document.querySelector('#confirmedStudents').addEventListener('click', () => {
+    ListePrincipale.classList.add('nodisp');
+    ListeAttente.classList.add('nodisp');
+    Results.classList.add('nodisp');
+    conf.classList.remove('nodisp');
 });
 
 function validate(evt) {

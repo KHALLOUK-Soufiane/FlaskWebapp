@@ -13,13 +13,14 @@
         <img id="headerMeknes" src="static/logoMeknes.png">
         <img id="headerRabat" src="static/logoRabat.png">
     </header>
-    <h1>plate-forme d'affectation aux ENSAMs</h1>
+    <h1>plate-forme d'affectation aux ENSAM</h1>
     <h1 style="padding-top: 0;padding-bottom: 10px; text-align: right;"><button class="btn"><a href="logout" style="color: white; text-decoration: none;">LOGOUT</a></button></h1>
     <nav>
         <button class='btn' id="Results">Resultas du Concours</button>
         <button class='btn' id="LPButton">Listes Principales</button>
         <button class='btn' id="LAButton">Listes d'attentes</button>
-        <a href='downloadFiles' target="_blank"><button class='btn' id="LAButton">Télécharger les Listes</button></a> 
+        <a href='downloadFiles' target="_blank"><button class='btn' id="LAButton">Télécharger les Listes</button></a>
+        <button class='btn' id="confirmedStudents">étudiants confirmés</button> 
     </nav>
     
     <div id="RES" class="main">
@@ -160,21 +161,21 @@
             {% if lp_casa != 'NULL' and lp_meknes != 'NULL' and lp_rabat !='NULL'%}
             <nav>
                 {% if current_user.username == 'ENSAM_Casa' or current_user.username == 'admin' %} 
-                    <button class='btn' id="LPCasaButton">LP Casa</button>
+                    <button class='btn' id="LPCasaButton">Liste principale Casa</button>
                 {% else %}
-                    <button class='btn nodisp' id="LPCasaButton">LP Casa</button>
+                    <button class='btn nodisp' id="LPCasaButton">Liste Principale Casa</button>
                 {% endif %}
 
                 {% if current_user.username == 'ENSAM_Meknes' or current_user.username == 'admin' %} 
-                    <button class='btn' id="LPMeknesButton">LP Meknes</button>
+                    <button class='btn' id="LPMeknesButton">Liste Principale Meknes</button>
                 {% else %}
-                    <button class='btn nodisp' id="LPMeknesButton">LP Meknes</button>
+                    <button class='btn nodisp' id="LPMeknesButton">Liste Principale Meknes</button>
                 {% endif %}
 
                 {% if current_user.username == 'ENSAM_Rabat' or current_user.username == 'admin' %} 
-                    <button class='btn' id="LPRabatButton">LP Rabat</button>
+                    <button class='btn' id="LPRabatButton">Liste Principale Rabat</button>
                 {% else %}
-                    <button class='btn nodisp' id="LPRabatButton">LP Rabat</button>
+                    <button class='btn nodisp' id="LPRabatButton">Liste Principale Rabat</button>
                 {% endif %}
 
             </nav>
@@ -321,7 +322,7 @@
                     </div>
                       
                 </div>
-                <label for="genererLABtn" class="btn">Générer les listes attentes</label>
+                <label for="genererLABtn" class="btn">Générer les listes d'attentes</label>
                 <input style="display: none;" id="genererLABtn" type="submit" name="genererLA" value="P">
             </form>
 
@@ -354,21 +355,21 @@
             {% if lp_casa != 'NULL' and lp_meknes != 'NULL' and lp_rabat !='NULL'%}
             <nav>
                 {% if current_user.username == 'ENSAM_Casa' or current_user.username == 'admin' %} 
-                    <button class='btn' id="LACasaButton">LP Casa</button>
+                    <button class='btn' id="LACasaButton">Liste Attente Casablanca</button>
                 {% else %}
-                    <button class='btn nodisp' id="LACasaButton">LP Casa</button>
+                    <button class='btn nodisp' id="LACasaButton">Liste Attente Casablanca</button>
                 {% endif %}
 
                 {% if current_user.username == 'ENSAM_Meknes' or current_user.username == 'admin' %} 
-                    <button class='btn' id="LAMeknesButton">LP Meknes</button>
+                    <button class='btn' id="LAMeknesButton">Liste Attente Meknes</button>
                 {% else %}
-                    <button class='btn nodisp' id="LAMeknesButton">LP Meknes</button>
+                    <button class='btn nodisp' id="LAMeknesButton">Liste Attente Meknes</button>
                 {% endif %}
 
                 {% if current_user.username == 'ENSAM_Rabat' or current_user.username == 'admin' %} 
-                    <button class='btn' id="LARabatButton">LP Rabat</button>
+                    <button class='btn' id="LARabatButton">Liste Attente Rabat</button>
                 {% else %}
-                    <button class='btn nodisp' id="LARabatButton">LP Rabat</button>
+                    <button class='btn nodisp' id="LARabatButton">Liste Attente Rabat</button>
                 {% endif %}
 
             </nav>
@@ -378,7 +379,7 @@
                     <form action="confirmStudentsLA" method="post" id='confirmationFormCasaLA'></form>
                     <table class="table">
                         <tr>
-                            <th colspan="100%">Liste Principale Casablanca</th>
+                            <th colspan="100%">Liste d'Attente Casablanca</th>
                         </tr>
                         <tr>
                             <th>rang</th>
@@ -410,7 +411,7 @@
                     <form action="confirmStudentsLA" method="post" id='confirmationFormMeknesLA'></form>
                     <table class="table">
                         <tr>
-                            <th colspan="100%">Liste Principale Meknes</th>
+                            <th colspan="100%">Liste d'Attente Meknes</th>
                         </tr>
                         <tr>
                             <th>rang</th>
@@ -441,7 +442,7 @@
                     <form action="confirmStudentsLA" method="post" id='confirmationFormRabatLA'></form>
                     <table class="table">
                         <tr>
-                            <th colspan="100%">Liste Principale Rabat</th>
+                            <th colspan="100%">Liste d'Attente Rabat</th>
                         </tr>
                         <tr>
                             <th>rang</th>
@@ -464,6 +465,123 @@
                     </table>
                     <label for="SubmitRabatBtnLA" class="btn">Confirmer</label>
                     <input form='confirmationFormRabatLA' style="display: none;" id="SubmitRabatBtnLA" type="submit" name="submit" value="rabat">
+            {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="conf" class="nodisp main">
+        
+        <div class="tables">
+            {% if lp_casa != 'NULL' and lp_meknes != 'NULL' and lp_rabat !='NULL'%}
+            <nav>
+                {% if current_user.username == 'ENSAM_Casa' or current_user.username == 'admin' %} 
+                    <button class='btn' id="ConfCasaButton">LP Casa</button>
+                {% else %}
+                    <button class='btn nodisp' id="ConfCasaButton">LP Casa</button>
+                {% endif %}
+    
+                {% if current_user.username == 'ENSAM_Meknes' or current_user.username == 'admin' %} 
+                    <button class='btn' id="ConfMeknesButton">LP Meknes</button>
+                {% else %}
+                    <button class='btn nodisp' id="ConfMeknesButton">LP Meknes</button>
+                {% endif %}
+    
+                {% if current_user.username == 'ENSAM_Rabat' or current_user.username == 'admin' %} 
+                    <button class='btn' id="ConfRabatButton">LP Rabat</button>
+                {% else %}
+                    <button class='btn nodisp' id="ConfRabatButton">LP Rabat</button>
+                {% endif %}
+    
+            </nav>
+    
+            <div id='lpCasa'>
+            {% if current_user.username == 'ENSAM_Casa' or current_user.username == 'admin' %} 
+                    <form action="confirmStudents" method="post" id='confirmationFormCasa'></form>
+                    <table class="table">
+                        <tr>
+                            <th colspan="100%">Liste Confirmés Casablanca</th>
+                        </tr>
+                        <tr>
+                            <th>RANG</th>
+                            <th>CNE</th>
+                            <th>Nom et Prenom</th>
+                            <th>Moyenne</th>
+                            <th>Confirmé</th>
+                        </tr>
+    
+                        {% set index = namespace(value=1) %}
+                        {% for row in lp_casa %}
+                        <tr>
+                            <td>{{ index.value }}</td>
+                            <td>{{ row.cne }}</td>
+                            <td>{{ row.nomPrenom }}</td>
+                            <td>{{ row.moyenne }}</td>
+                            <td><input form='confirmationFormCasa' type="checkbox" name="confirmedCasa" value={{ row.cne }} {{'checked' if row.confirmed == True else ''}}></td>
+                            {% set index.value = index.value + 1 %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <label for="SubmitCasaBtn" class="btn">Confirmer</label>
+                    <input form='confirmationFormCasa' style="display: none;" id="SubmitCasaBtn" type="submit" name="submit" value="casa">
+            {% endif %}
+            </div>
+            
+            <div id="lpMeknes" class="nodisp">
+            {% if current_user.username == 'ENSAM_Meknes' or current_user.username == 'admin' %} 
+                    <form action="confirmStudents" method="post" id='confirmationFormMeknes'></form>
+                    <table class="table">
+                        <tr>
+                            <th colspan="100%">Liste Confirmés Meknes</th>
+                        </tr>
+                        <tr>
+                            <th>CNE</th>
+                            <th>Nom et Prenom</th>
+                            <th>CdFiliere</th>
+                            <th>Confirmé</th>
+                        </tr>
+    
+                        {% for row in Inscrits %}
+                        <tr>
+                            {%if row.Ville == 'Meknes' %}
+                            <td>{{ row.cne }}</td>
+                            <td>{{ row.nomPrenom}}</td>
+                            <td>{{ row.moyenne}}</td>
+                            {%endif%}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <label for="SubmitMeknesBtn" class="btn">Confirmer</label>
+                    <input form='confirmationFormMeknes' style="display: none;" id="SubmitMeknesBtn" type="submit" name="submit" value="meknes">
+            {% endif %}
+            </div>
+    
+            <div id="lpRabat" class="nodisp">
+            {% if current_user.username == 'ENSAM_Rabat' or current_user.username == 'admin' %} 
+                    <form action="confirmStudents" method="post" id='confirmationFormRabat'></form>
+                    <table class="table">
+                        <tr>
+                            <th colspan="100%">Liste Principale Rabat</th>
+                        </tr>
+                        <tr>
+                            <th>CNE</th>
+                            <th>Nom et Prenom</th>
+                            <th>Moyenne</th>
+                            <th>Confirmé</th>
+                        </tr>
+    
+                        {% for row in lp_rabat %}
+                        <tr>
+                            <td>{{ row.cne }}</td>
+                            <td>{{ row.nomPrenom}}</td>
+                            <td>{{ row.moyenne}}</td>
+                            <td><input form='confirmationFormRabat' type="checkbox" name="confirmedRabat" value={{ row.cne }} id="" {{'checked' if row.confirmed == True else ''}}></td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <label for="SubmitRabatBtn" class="btn">Confirmer</label>
+                    <input form='confirmationFormRabat' style="display: none;" id="SubmitRabatBtn" type="submit" name="submit" value="rabat">
             {% endif %}
             </div>
             {% endif %}

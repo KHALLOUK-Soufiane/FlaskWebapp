@@ -30,7 +30,14 @@ class ResultsSP(db.Model):
     cdFiliere = db.Column(db.String)
     moyenne = db.Column(db.Float)
     status = db.Column(db.Integer)
-    
+
+class Inscrits(db.Model):
+    __tablename__='Inscrits'
+    cne = db.Column(db.String, primary_key=True)
+    nomPrenom = db.Column(db.String)
+    cdFiliere = db.Column(db.String)
+    Ville = db.Column(db.String)
+
 class LPCasa(db.Model):
     __tablename__ = 'lp_casa'
     cne = db.Column(db.String, primary_key=True)

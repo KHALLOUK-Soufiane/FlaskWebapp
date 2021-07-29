@@ -17,7 +17,7 @@ from flask_login import LoginManager, current_user, login_user
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, CHOICE_CODES, SECRET_KEY, ENSAM_CODES, CODES_FILIERES_SM
-from models import Results, ResultsSP, LPCasa, LPMeknes, LPRabat, LACasa, LAMeknes, LARabat, LACasaSP, LAMeknesSP, LARabatSP, User, LoginForm, db
+from models import Results, ResultsSP, LPCasa, LPMeknes, LPRabat, LACasa, LAMeknes, LARabat, LACasaSP, LAMeknesSP, LARabatSP, User, LoginForm,Inscrits, db
 import pymysql 
 pymysql.install_as_MySQLdb()
  
@@ -191,6 +191,14 @@ def confirmStudents():
 
             Results.to_sql('results', con=db.engine, index=False, if_exists='replace')
             ResultsSP.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
+            RSP = ResultsSP[['cne', 'cdFiliere','nomPrenom']]
+            RSP['Ville']='casa'
+            RSP.to_sql('Inscrits', con=db.engine, index=False, if_exists='append')
+            RSM = Results[['cne', 'cdFiliere','nomPrenom']]
+            RSM['Ville']='casa'
+            RSM.to_sql('Inscrits', con=db.engine, index=False, if_exists='append')
+            
+
 
             
 
@@ -224,6 +232,13 @@ def confirmStudents():
 
             Results.to_sql('results', con=db.engine, index=False, if_exists='replace')
             ResultsSP.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
+
+            RSP = ResultsSP[['cne', 'cdFiliere','nomPrenom']]
+            RSP['Ville']='meknes'
+            RSP.to_sql('Inscrits', con=db.engine, index=False, if_exists='append')
+            RSM = Results[['cne', 'cdFiliere','nomPrenom']]
+            RSM['Ville']='meknes'
+            RSM.to_sql('Inscrits', con=db.engine, index=False, if_exists='append')
         elif request.form['submit'] == 'rabat':
             lp = pd.read_sql('SELECT * FROM lp_rabat', con=db.engine)
             ResultsSP = pd.read_sql('SELECT * FROM results_sp', con=db.engine)
@@ -252,6 +267,13 @@ def confirmStudents():
 
             Results.to_sql('results', con=db.engine, index=False, if_exists='replace')
             ResultsSP.to_sql('results_sp', con=db.engine, index=False, if_exists='replace')
+
+            RSP = ResultsSP[['cne', 'cdFiliere','nomPrenom']]
+            RSP['Ville']='rabat'
+            RSP.to_sql('Inscrits', con=db.engine, index=False, if_exists='append')
+            RSM = Results[['cne', 'cdFiliere','nomPrenom']]
+            RSM['Ville']='rabat'
+            RSM.to_sql('Inscrits', con=db.engine, index=False, if_exists='append')            
     
     return redirect('/')
 
