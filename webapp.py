@@ -25,6 +25,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['AVAILABLE_PLACES_SM'] = 'NULL'
 app.config['AVAILABLE_PLACES_SP'] = 'NULL'
+app.config['LA_NUM'] = 0
 login = LoginManager(app)
 db.init_app(app)
 
@@ -169,7 +170,14 @@ def uploadResults():
                 db.session.query(InscritsCasa).delete()
                 db.session.query(InscritsMeknes).delete()
                 db.session.query(InscritsRabat).delete()
+                db.session.query(LPCasa).delete()
+                db.session.query(LPMeknes).delete()
+                db.session.query(LPRabat).delete()
+                db.session.query(LACasa).delete()
+                db.session.query(LAMeknes).delete()
+                db.session.query(LARabat).delete()
                 db.session.commit()
+                app.config['LA_NUM'] = 0
                                 
                 return redirect('/') 
 
@@ -204,15 +212,25 @@ def confirmStudents():
             
             RLP = pd.read_sql('SELECT * FROM lp_casa', con=db.engine)
             RLA = pd.read_sql('SELECT * FROM la_casa', con=db.engine)
+            ins = pd.read_sql('SELECT * FROM inscritscasa', con=db.engine)
             RLP = RLP.loc[RLP['confirmed'] == True]
             RLA = RLA.loc[RLA['confirmed'] == True]
             
+            ins = ins[ins.laNum != 0]
+            ins = ins[ins.laNum != app.config['LA_NUM']]
+            
             RLP['Ville']='casa'
-            RLA['Ville']='casa'            
+            RLA['Ville']='casa'
+            RLP['laNum']=0
+            RLA['laNum']=app.config['LA_NUM']
+            
+            
 
             conf = pd.concat([RLP, RLA])
+            ins = ins.append(conf, ignore_index=True)
+            ins.sort_values(by=['moyenne'], inplace=True, ascending=False)
             
-            conf.to_sql('inscritscasa', con=db.engine, index=False, if_exists='replace')
+            ins.to_sql('inscritscasa', con=db.engine, index=False, if_exists='replace')
             
         elif request.form['submit'] == 'meknes':
             lp = pd.read_sql('SELECT * FROM lp_meknes', con=db.engine)
@@ -243,15 +261,24 @@ def confirmStudents():
             
             RLP = pd.read_sql('SELECT * FROM lp_meknes', con=db.engine)
             RLA = pd.read_sql('SELECT * FROM la_meknes', con=db.engine)
+            ins = pd.read_sql('SELECT * FROM inscritsmeknes', con=db.engine)
             RLP = RLP.loc[RLP['confirmed'] == True]
             RLA = RLA.loc[RLA['confirmed'] == True]
             
+            ins = ins[ins.laNum != 0]
+            ins = ins[ins.laNum != app.config['LA_NUM']]
+            
             RLP['Ville']='meknes'
             RLA['Ville']='meknes'
+            RLP['laNum']=0
+            RLA['laNum']=app.config['LA_NUM']  
             
+
             conf = pd.concat([RLP, RLA])
+            ins = ins.append(conf, ignore_index=True)
+            ins.sort_values(by=['moyenne'], inplace=True, ascending=False)
             
-            conf.to_sql('inscritsmeknes', con=db.engine, index=False, if_exists='replace')
+            ins.to_sql('inscritsmeknes', con=db.engine, index=False, if_exists='replace')
             
         elif request.form['submit'] == 'rabat':
             lp = pd.read_sql('SELECT * FROM lp_rabat', con=db.engine)
@@ -283,15 +310,24 @@ def confirmStudents():
 
             RLP = pd.read_sql('SELECT * FROM lp_rabat', con=db.engine)
             RLA = pd.read_sql('SELECT * FROM la_rabat', con=db.engine)
+            ins = pd.read_sql('SELECT * FROM inscritsrabat', con=db.engine)
             RLP = RLP.loc[RLP['confirmed'] == True]
             RLA = RLA.loc[RLA['confirmed'] == True]
             
+            ins = ins[ins.laNum != 0]
+            ins = ins[ins.laNum != app.config['LA_NUM']]
+            
             RLP['Ville']='rabat'
             RLA['Ville']='rabat'
+            RLP['laNum']=0
+            RLA['laNum']=app.config['LA_NUM']  
             
-            confirmed = pd.concat([RLP, RLA])
+
+            conf = pd.concat([RLP, RLA])
+            ins = ins.append(conf, ignore_index=True)
+            ins.sort_values(by=['moyenne'], inplace=True, ascending=False)
             
-            confirmed.to_sql('inscritsrabat', con=db.engine, index=False, if_exists='replace')          
+            ins.to_sql('inscritsrabat', con=db.engine, index=False, if_exists='replace')        
     
     return redirect('/')
 
@@ -332,16 +368,24 @@ def confirmStudentsLA():
 
             RLP = pd.read_sql('SELECT * FROM lp_casa', con=db.engine)
             RLA = pd.read_sql('SELECT * FROM la_casa', con=db.engine)
+            ins = pd.read_sql('SELECT * FROM inscritscasa', con=db.engine)
             RLP = RLP.loc[RLP['confirmed'] == True]
             RLA = RLA.loc[RLA['confirmed'] == True]
             
+            ins = ins[ins.laNum != 0]
+            ins = ins[ins.laNum != app.config['LA_NUM']]
+            
             RLP['Ville']='casa'
             RLA['Ville']='casa'
+            RLP['laNum']=0
+            RLA['laNum']=app.config['LA_NUM']  
             
 
             conf = pd.concat([RLP, RLA])
+            ins = ins.append(conf, ignore_index=True)
+            ins.sort_values(by=['moyenne'], inplace=True, ascending=False)
             
-            conf.to_sql('inscritscasa', con=db.engine, index=False, if_exists='replace')
+            ins.to_sql('inscritscasa', con=db.engine, index=False, if_exists='replace')
 
 
             
@@ -376,16 +420,24 @@ def confirmStudentsLA():
             
             RLP = pd.read_sql('SELECT * FROM lp_meknes', con=db.engine)
             RLA = pd.read_sql('SELECT * FROM la_meknes', con=db.engine)
+            ins = pd.read_sql('SELECT * FROM inscritsmeknes', con=db.engine)
             RLP = RLP.loc[RLP['confirmed'] == True]
             RLA = RLA.loc[RLA['confirmed'] == True]
             
+            ins = ins[ins.laNum != 0]
+            ins = ins[ins.laNum != app.config['LA_NUM']]
+            
             RLP['Ville']='meknes'
             RLA['Ville']='meknes'
+            RLP['laNum']=0
+            RLA['laNum']=app.config['LA_NUM']  
             
 
             conf = pd.concat([RLP, RLA])
+            ins = ins.append(conf, ignore_index=True)
+            ins.sort_values(by=['moyenne'], inplace=True, ascending=False)
             
-            conf.to_sql('inscritsmeknes', con=db.engine, index=False, if_exists='replace')
+            ins.to_sql('inscritsmeknes', con=db.engine, index=False, if_exists='replace')
             
         elif request.form['submit'] == 'rabat':
             lp = pd.read_sql('SELECT * FROM la_rabat', con=db.engine)
@@ -421,16 +473,23 @@ def confirmStudentsLA():
             
             RLP = pd.read_sql('SELECT * FROM lp_rabat', con=db.engine)
             RLA = pd.read_sql('SELECT * FROM la_rabat', con=db.engine)
+            ins = pd.read_sql('SELECT * FROM inscritsrabat', con=db.engine)
             RLP = RLP.loc[RLP['confirmed'] == True]
             RLA = RLA.loc[RLA['confirmed'] == True]
             
+            ins = ins[ins.laNum != 0]
+            ins = ins[ins.laNum != app.config['LA_NUM']]
+            
             RLP['Ville']='rabat'
             RLA['Ville']='rabat'
-            
+            RLP['laNum']=0
+            RLA['laNum']=app.config['LA_NUM']            
 
             conf = pd.concat([RLP, RLA])
+            ins = ins.append(conf, ignore_index=True)
+            ins.sort_values(by=['moyenne'], inplace=True, ascending=False)
             
-            conf.to_sql('inscritsrabat', con=db.engine, index=False, if_exists='replace')
+            ins.to_sql('inscritsrabat', con=db.engine, index=False, if_exists='replace') 
               
     return redirect('/')
 
@@ -567,7 +626,9 @@ def genererLA():
                 listesPrincipales[key]=pd.DataFrame(listesPrincipales[key])
                 listesPrincipales[key]['confirmed'] = False
                 listesPrincipales[key].to_sql('la_'+key, con=db.engine, index=False, if_exists='replace')
-                
+            
+            app.config['LA_NUM'] += 1
+            print(app.config['LA_NUM'])
             return redirect('/')
         elif request.form.get('genererLA') == 'NP':
 
@@ -606,6 +667,9 @@ def genererLA():
                 listesPrincipales[key]=pd.DataFrame(listesPrincipales[key])
                 listesPrincipales[key]['confirmed'] = False
                 listesPrincipales[key].to_sql('la_'+key, con=db.engine, index=False, if_exists='replace')
+            
+            app.config['LA_NUM'] += 1
+            print(app.config['LA_NUM'])
             return redirect('/')          
 
 @app.route('/genererLP', methods=['POST'])
@@ -819,6 +883,45 @@ def downloadFiles():
         wb.save('output/Resultats.xlsx')
         return redirect('/zipnsend')
 
+
+@app.route('/downloadInscrits', methods=['POST'])
+def downloadInscrits():
+    InscritsCasa = pd.read_sql('SELECT * FROM inscritscasa', con=db.engine)
+    InscritsMeknes = pd.read_sql('SELECT * FROM inscritsmeknes', con=db.engine)
+    InscritsRabat = pd.read_sql('SELECT * FROM inscritsrabat', con=db.engine)
+    
+    nbEtudiantsC = len(InscritsCasa.index)
+    nbEtudiantsM = len(InscritsMeknes.index)
+    nbEtudiantsR = len(InscritsRabat.index)
+    
+    wb = openpyxl.load_workbook('output/Inscrits.xlsx')
+    ws = wb['ConfirmesCasa']
+    ws.delete_rows(0,4*nbEtudiantsC)
+    for row in dataframe_to_rows(InscritsCasa.loc[:,~(InscritsCasa.columns.str.match("Unnamed")) & ~(InscritsCasa.columns.str.match("confirmed")) & ~(InscritsCasa.columns.str.match("Ville")) & ~(InscritsCasa.columns.str.match("laNum"))], index=False):
+        ws.append(row)
+    for cell in ws["1:1"]:
+            cell.font = openpyxl.styles.Font(color='00000000', bold=True, size='12') 
+            cell.alignment = openpyxl.styles.alignment.Alignment(horizontal = 'center', vertical ='center')
+
+    ws = wb['ConfirmesMeknes']
+    ws.delete_rows(0,4*nbEtudiantsM)
+    for row in dataframe_to_rows(InscritsMeknes.loc[:,~(InscritsMeknes.columns.str.match("Unnamed")) & ~(InscritsMeknes.columns.str.match("confirmed")) & ~(InscritsMeknes.columns.str.match("Ville")) & ~(InscritsMeknes.columns.str.match("laNum"))], index=False):
+        ws.append(row)
+    for cell in ws["1:1"]:
+            cell.font = openpyxl.styles.Font(color='00000000', bold=True, size='12') 
+            cell.alignment = openpyxl.styles.alignment.Alignment(horizontal = 'center', vertical ='center')
+     
+    ws = wb['ConfirmesRabat']
+    ws.delete_rows(0,4*nbEtudiantsR)
+    for row in dataframe_to_rows(InscritsRabat.loc[:,~(InscritsRabat.columns.str.match("Unnamed")) & ~(InscritsRabat.columns.str.match("confirmed")) & ~(InscritsRabat.columns.str.match("Ville")) & ~(InscritsRabat.columns.str.match("laNum"))], index=False):
+        ws.append(row)
+    for cell in ws["1:1"]:
+            cell.font = openpyxl.styles.Font(color='00000000', bold=True, size='12') 
+            cell.alignment = openpyxl.styles.alignment.Alignment(horizontal = 'center', vertical ='center')
+    
+    wb.save('output/Inscrits.xlsx')
+    return redirect('/')
+        
 
 @app.route('/zipnsend')
 def zipnsend():

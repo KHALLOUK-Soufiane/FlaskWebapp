@@ -491,8 +491,14 @@
                 {% else %}
                     <button class='btn nodisp' id="ConfRabatButton">Etudiants Confirmés Rabat</button>
                 {% endif %}
-    
             </nav>
+
+            <div id="downloadInscrits">
+                <form id='downloadInscritsForm' action="downloadInscrits" method="post">
+                    <label for="downloadInscritsBtn" class="btn">Télécharger les étudiants confirmés</label>
+                    <input style="display: none;" id="downloadInscritsBtn" type="submit">
+                </form>
+            </div>
             
             {% if inscritsCasa != 'NULL'%}
             <div id='confCasa'>
