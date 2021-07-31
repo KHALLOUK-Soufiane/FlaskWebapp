@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jul 29, 2021 at 06:44 PM
+-- Generation Time: Jul 31, 2021 at 09:25 PM
 -- Server version: 10.4.10-MariaDB
 -- PHP Version: 7.4.0
 
@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS `inscritscasa` (
   `moyenne` double DEFAULT NULL,
   `cdFiliere` text DEFAULT NULL,
   `confirmed` bigint(20) DEFAULT NULL,
-  `Ville` text DEFAULT NULL
+  `Ville` text DEFAULT NULL,
+  `laNum` bigint(20) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -59,7 +60,8 @@ CREATE TABLE IF NOT EXISTS `inscritsmeknes` (
   `moyenne` double DEFAULT NULL,
   `cdFiliere` text DEFAULT NULL,
   `confirmed` bigint(20) DEFAULT NULL,
-  `Ville` text DEFAULT NULL
+  `Ville` text DEFAULT NULL,
+  `laNum` bigint(20) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -79,7 +81,8 @@ CREATE TABLE IF NOT EXISTS `inscritsrabat` (
   `moyenne` double DEFAULT NULL,
   `cdFiliere` text DEFAULT NULL,
   `confirmed` bigint(20) DEFAULT NULL,
-  `Ville` text DEFAULT NULL
+  `Ville` text DEFAULT NULL,
+  `laNum` bigint(20) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -104,26 +107,6 @@ CREATE TABLE IF NOT EXISTS `la_casa` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `la_casasp`
---
-
-DROP TABLE IF EXISTS `la_casasp`;
-CREATE TABLE IF NOT EXISTS `la_casasp` (
-  `cne` text DEFAULT NULL,
-  `nomPrenom` text DEFAULT NULL,
-  `choix1` bigint(20) DEFAULT NULL,
-  `choix2` bigint(20) DEFAULT NULL,
-  `choix3` bigint(20) DEFAULT NULL,
-  `filiere` text DEFAULT NULL,
-  `noteMaths` text DEFAULT NULL,
-  `notePhysique` text DEFAULT NULL,
-  `moyenne` double DEFAULT NULL,
-  `status` bigint(20) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `la_meknes`
 --
 
@@ -143,26 +126,6 @@ CREATE TABLE IF NOT EXISTS `la_meknes` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `la_meknessp`
---
-
-DROP TABLE IF EXISTS `la_meknessp`;
-CREATE TABLE IF NOT EXISTS `la_meknessp` (
-  `cne` text DEFAULT NULL,
-  `nomPrenom` text DEFAULT NULL,
-  `choix1` bigint(20) DEFAULT NULL,
-  `choix2` bigint(20) DEFAULT NULL,
-  `choix3` bigint(20) DEFAULT NULL,
-  `filiere` text DEFAULT NULL,
-  `noteMaths` text DEFAULT NULL,
-  `notePhysique` text DEFAULT NULL,
-  `moyenne` double DEFAULT NULL,
-  `status` bigint(20) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `la_rabat`
 --
 
@@ -177,26 +140,6 @@ CREATE TABLE IF NOT EXISTS `la_rabat` (
   `moyenne` double DEFAULT NULL,
   `cdFiliere` text DEFAULT NULL,
   `confirmed` tinyint(1) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `la_rabatsp`
---
-
-DROP TABLE IF EXISTS `la_rabatsp`;
-CREATE TABLE IF NOT EXISTS `la_rabatsp` (
-  `cne` text DEFAULT NULL,
-  `nomPrenom` text DEFAULT NULL,
-  `choix1` bigint(20) DEFAULT NULL,
-  `choix2` bigint(20) DEFAULT NULL,
-  `choix3` bigint(20) DEFAULT NULL,
-  `filiere` text DEFAULT NULL,
-  `noteMaths` text DEFAULT NULL,
-  `notePhysique` text DEFAULT NULL,
-  `moyenne` double DEFAULT NULL,
-  `status` bigint(20) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -265,13 +208,13 @@ CREATE TABLE IF NOT EXISTS `lp_rabat` (
 DROP TABLE IF EXISTS `results`;
 CREATE TABLE IF NOT EXISTS `results` (
   `cne` text DEFAULT NULL,
+  `nomPrenom` text DEFAULT NULL,
   `choix1` bigint(20) DEFAULT NULL,
   `choix2` bigint(20) DEFAULT NULL,
   `choix3` bigint(20) DEFAULT NULL,
   `filiere` text DEFAULT NULL,
   `cdFiliere` text DEFAULT NULL,
   `moyenne` double DEFAULT NULL,
-  `nomPrenom` text DEFAULT NULL,
   `status` bigint(20) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -284,13 +227,13 @@ CREATE TABLE IF NOT EXISTS `results` (
 DROP TABLE IF EXISTS `results_sp`;
 CREATE TABLE IF NOT EXISTS `results_sp` (
   `cne` text DEFAULT NULL,
+  `nomPrenom` text DEFAULT NULL,
   `choix1` bigint(20) DEFAULT NULL,
   `choix2` bigint(20) DEFAULT NULL,
   `choix3` bigint(20) DEFAULT NULL,
   `filiere` text DEFAULT NULL,
   `cdFiliere` text DEFAULT NULL,
   `moyenne` double DEFAULT NULL,
-  `nomPrenom` text DEFAULT NULL,
   `status` bigint(20) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
