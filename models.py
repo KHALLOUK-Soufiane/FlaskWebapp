@@ -32,7 +32,7 @@ class ResultsSP(db.Model):
     status = db.Column(db.Integer)
 
 class InscritsCasa(db.Model):
-    __tablename__='inscritsCasa'
+    __tablename__='inscritscasa'
     cne = db.Column(db.String, primary_key=True)
     nomPrenom = db.Column(db.String)
     choix1 = db.Column(db.Integer)
@@ -45,7 +45,7 @@ class InscritsCasa(db.Model):
     Ville = db.Column(db.String)
 
 class InscritsMeknes(db.Model):
-    __tablename__='inscritsMeknes'
+    __tablename__='inscritsmeknes'
     cne = db.Column(db.String, primary_key=True)
     nomPrenom = db.Column(db.String)
     choix1 = db.Column(db.Integer)
@@ -58,7 +58,7 @@ class InscritsMeknes(db.Model):
     Ville = db.Column(db.String)
 
 class InscritsRabat(db.Model):
-    __tablename__='inscritsRabat'
+    __tablename__='inscritsrabat'
     cne = db.Column(db.String, primary_key=True)
     nomPrenom = db.Column(db.String)
     choix1 = db.Column(db.Integer)

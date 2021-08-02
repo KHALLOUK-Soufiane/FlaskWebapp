@@ -808,7 +808,6 @@ def downloadFiles():
             if flag:
                 ws.cell(i, maxCol+2).value = ''
 
-
         ws = wb['resultatsSP']
         ws.delete_rows(0,4*nbEtudiantsSP)
         for row in dataframe_to_rows(resultsSP.loc[:,~resultsSP.columns.str.match("Unnamed") & ~(results.columns.str.match("status"))], index=False):
@@ -920,8 +919,15 @@ def downloadInscrits():
             cell.alignment = openpyxl.styles.alignment.Alignment(horizontal = 'center', vertical ='center')
     
     wb.save('output/Inscrits.xlsx')
-    return redirect('/')
-        
+    return redirect('/output/Inscrits.xlsx')
+
+@app.route('/output/Inscrits.xlsx')
+def getInscrits():
+    if current_user.is_authenticated:
+        try:
+            return send_from_directory('output', 'Inscrits.xlsx', as_attachment=True)
+        except FileNotFoundError:
+            abort(404) 
 
 @app.route('/zipnsend')
 def zipnsend():
@@ -938,10 +944,11 @@ def zipnsend():
 
 @app.route("/zip/output.zip")
 def getFile():
-    try:
-        return send_from_directory('zip', 'output.zip', as_attachment=True)
-    except FileNotFoundError:
-        abort(404)           
+    if current_user.is_authenticated:
+        try:
+            return send_from_directory('zip', 'output.zip', as_attachment=True)
+        except FileNotFoundError:
+            abort(404)           
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
