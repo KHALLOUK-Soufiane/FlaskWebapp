@@ -254,6 +254,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Dumping data for table `users`
 --
 
+
+-- Test Usernames
 INSERT INTO `users` (`username`, `password`) VALUES
 ('admin', 'pbkdf2:sha256:260000$fJPvyFgnZvZYQMjs$b018057892d5acbf78229001e8693e98e8a8cfd58095b7a02f878eddd9b5dbf2'),
 ('ENSAM_Rabat', 'pbkdf2:sha256:260000$sIT0VcCtNHNLQLKV$6a6cad974c7a195abc00015feccb26e7d39c35972422f366fbc0b3ef74151bac'),
